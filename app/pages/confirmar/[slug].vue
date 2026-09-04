@@ -66,17 +66,18 @@ async function send(action: ConfirmationAction) {
   sending.value = action
   problem.value = null
   try {
-    const response = await $fetch<ConfirmationResult>('/api/confirmacao', {
+    // Sem tipo no $fetch: o corpo é conferido em api-result, não suposto aqui.
+    const response = await $fetch('/api/confirmacao', {
       method: 'POST',
       // Só isto sobe: nenhum dado da Iniciativa vem daqui, ele é lido do
       // repositório pela Function (ver shared/confirmation/process.ts).
       body: { token: token.value, action, turnstileToken: turnstileToken.value },
       ignoreResponseError: true,
     })
-    if (response.ok) {
+    if (isApiSuccess<ConfirmationResult>(response)) {
       done.value = { action: response.action, prUrl: response.prUrl }
     } else {
-      problem.value = { reason: response.reason, message: response.message }
+      problem.value = problemOf(response)
     }
   } catch {
     problem.value = { reason: 'envio', message: strings.register.connectionFailure }

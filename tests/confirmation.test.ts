@@ -251,7 +251,7 @@ describe('processConfirmation · recusas', () => {
     expect(deps.createPullRequest).not.toHaveBeenCalled()
   })
 
-  it('falha do GitHub devolve 502', async () => {
+  it('falha do GitHub devolve 503', async () => {
     const deps = fakeDeps({
       createPullRequest: vi.fn(async () => {
         throw new Error('GitHub fora do ar')
@@ -261,7 +261,7 @@ describe('processConfirmation · recusas', () => {
 
     expect(result.ok).toBe(false)
     if (result.ok) return
-    expect(result.status).toBe(502)
+    expect(result.status).toBe(503)
   })
 
   it('sem CONFIRMATION_SECRET configurado nenhum token vale', async () => {
