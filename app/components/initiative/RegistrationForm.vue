@@ -253,7 +253,8 @@ async function submit() {
   submitting.value = true
   errors.value = []
   try {
-    const response = await $fetch<RegistrationResult>('/api/cadastro', {
+    // Sem tipo no $fetch: o corpo é conferido em api-result, não suposto aqui.
+    const response = await $fetch('/api/cadastro', {
       method: 'POST',
       body: {
         initiative: buildInitiative(),
@@ -263,11 +264,11 @@ async function submit() {
       },
       ignoreResponseError: true,
     })
-    if (response.ok) {
+    if (isApiSuccess<RegistrationResult>(response)) {
       prUrl.value = response.prUrl
       analytics.trackCadastroSuccess(editSlug ? 'edicao' : 'novo')
     } else {
-      errors.value = response.errors
+      errors.value = fieldErrorsOf(response)
     }
   } catch {
     errors.value = [{ field: '(envio)', message: t.connectionFailure }]

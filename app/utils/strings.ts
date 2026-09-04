@@ -106,6 +106,9 @@ export const strings = {
     pixAtOfficialChannel: 'PIX (no canal oficial)',
     sourceClearedWarning: 'Você alterou a chave. Informe a Fonte onde a nova chave aparece.',
     connectionFailure: 'Falha de conexão. Tente novamente.',
+    unexpectedFailure:
+      'O envio falhou por um motivo que não conseguimos identificar. Tente novamente em '
+      + 'instantes; se continuar, fale com a gente pela página de contato.',
     donationsSection: 'Como doar',
     sourceRule:
       'Regra nº 1: toda chave de doação precisa de uma Fonte, o link do post ou bio oficial onde a própria iniciativa divulga essa chave. Sem Fonte, o cadastro não é aprovado.',
