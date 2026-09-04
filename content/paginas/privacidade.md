@@ -41,7 +41,7 @@ Mantemos os dados publicados enquanto a iniciativa existir e não pedir para sai
 Você tem os direitos do art. 18 da LGPD, e aqui eles funcionam assim:
 
 - **Corrigir.** Abra a página da sua iniciativa e use **"Sugerir correção"**. Não precisa de conta em nada. Um moderador revisa e publica.
-- **Sair do site (oposição).** Escreva para **mapadaspatas@gmail.com**. Removemos a iniciativa do site e do conjunto de dados na próxima publicação, e guardamos apenas o registro mínimo de que houve o pedido — o endereço da página e a data, sem seus dados de contato — para que ninguém a recadastre depois.
+- **Sair do site (oposição).** Escreva para **contato@mapadaspatas.com.br**. Removemos a iniciativa do site e do conjunto de dados na próxima publicação, e guardamos apenas o registro mínimo de que houve o pedido — o endereço da página e a data, sem seus dados de contato — para que ninguém a recadastre depois.
 - **Eliminar.** Se você pedir eliminação, e não só remoção, além de tirar do site nós **reescrevemos o histórico do repositório** para apagar o dado também das versões anteriores. O limite honesto: cópias, clones e forks feitos por terceiros antes do pedido estão fora do nosso alcance, e não podemos prometer o que não controlamos.
 - **Saber o que temos sobre você.** Tudo o que temos é o que está publicado na página da iniciativa e no histórico do repositório, aberto para qualquer pessoa ler. Não há cadastro oculto, dado inferido nem enriquecimento de base.
 
@@ -67,7 +67,7 @@ Somos um diretório, não uma auditoria. A **Fonte** ao lado de cada chave permi
 
 ## Contato
 
-O Mapa das Patas é um projeto comunitário sem fins lucrativos e sem personalidade jurídica; o tratamento desses dados é responsabilidade de sua equipe de mantenedores, que você alcança em **mapadaspatas@gmail.com**. É o canal para pedidos de titular, dúvidas sobre esta política e comunicações da ANPD.
+O Mapa das Patas é um projeto comunitário sem fins lucrativos e sem personalidade jurídica; o tratamento desses dados é responsabilidade de sua equipe de mantenedores, que você alcança em **contato@mapadaspatas.com.br**. É o canal para pedidos de titular, dúvidas sobre esta política e comunicações da ANPD.
 
 Como agente de tratamento de pequeno porte, o projeto é dispensado de indicar um encarregado formal (Resolução CD/ANPD nº 2/2022), mas mantém este canal de comunicação, que é o exigido no lugar.
 

@@ -287,7 +287,7 @@ export const strings = {
      * variável sobrescrita faria a página com valor legal mentir. O
      * `tests/privacy-page.test.ts` amarra os dois.
      */
-    email: 'mapadaspatas@gmail.com',
+    email: 'contato@mapadaspatas.com.br',
     instagramLabel: 'Instagram',
     instagramHandle: '@mapadaspatas',
     instagramUrl: 'https://instagram.com/mapadaspatas',
