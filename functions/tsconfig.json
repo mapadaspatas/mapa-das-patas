@@ -1,0 +1,49 @@
+{
+  /*
+   * As Pages Functions ficam fora de todos os tsconfig que o Nuxt gera
+   * (`.nuxt/tsconfig.*.json` incluem app/, server/ e shared/, nunca functions/),
+   * e o build do Cloudflare Pages empacota este diretório com esbuild, que apaga
+   * os tipos sem conferir nenhum. Sem este arquivo, `functions/api/*.ts` é o
+   * único código do repositório que estreia em produção sem ter sido compilado
+   * uma vez sequer — e é o caminho de produção, não o server route de dev, que
+   * é quem tem rede.
+   */
+  "compilerOptions": {
+    /*
+     * Mesmos rigores do tsconfig do Nuxt, de propósito: a casca de produção não
+     * pode ser conferida com régua mais frouxa que o núcleo em shared/ que ela
+     * chama.
+     */
+    "target": "ESNext",
+    "module": "preserve",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    // shared/schema/initiative.ts importa `../cnpj.ts` com a extensão; o
+    // tsconfig do Nuxt também liga esta opção, então os dois leem o mesmo shared/.
+    "allowImportingTsExtensions": true,
+
+    /*
+     * `webworker` sem `dom`: o mais perto do workerd sem instalar os tipos da
+     * Cloudflare. Tem Request, Response, fetch, crypto.subtle, TextEncoder e
+     * btoa — tudo que shared/ usa — e não tem window nem localStorage, que não
+     * existem dentro da Function.
+     */
+    "lib": ["ESNext", "WebWorker"],
+
+    /*
+     * `types: []` deixa o @types/node de fora de propósito. É o que faz um
+     * `import 'node:fs'` que caísse em shared/ parar aqui: o server route de dev
+     * e o vitest rodam em Node e aceitariam calados, e a quebra só apareceria
+     * em produção.
+     */
+    "types": []
+  },
+
+  // shared/ entra sozinho, pelos imports das duas Functions.
+  "include": ["**/*.ts"]
+}
