@@ -1,5 +1,5 @@
 import { createDeps } from '../../shared/registration/adapters'
-import { processRegistration } from '../../shared/registration/process'
+import { processRegistration, type RegistrationResult } from '../../shared/registration/process'
 
 /**
  * Cloudflare Pages Function: POST /api/cadastro
@@ -22,15 +22,34 @@ export async function onRequestPost(context: { request: Request, env: Registrati
     payload = undefined
   }
 
-  const result = await processRegistration(
-    payload,
-    createDeps({
-      githubToken: context.env.GITHUB_TOKEN,
-      githubRepo: context.env.GITHUB_REPO,
-      turnstileSecret: context.env.TURNSTILE_SECRET,
-      baseBranch: context.env.BRANCH_BASE,
-    }),
-  )
+  /*
+   * Exception aqui não pode escapar: sem este catch a Cloudflare responde com a
+   * página de erro do runtime, o formulário recebe um corpo que não é o
+   * combinado e a pessoa fica sem aviso nenhum na tela (ver app/utils/api-result.ts).
+   * O corpo de erro é o mesmo formato dos outros, então o formulário sabe ler.
+   */
+  let result: RegistrationResult
+  try {
+    result = await processRegistration(
+      payload,
+      createDeps({
+        githubToken: context.env.GITHUB_TOKEN,
+        githubRepo: context.env.GITHUB_REPO,
+        turnstileSecret: context.env.TURNSTILE_SECRET,
+        baseBranch: context.env.BRANCH_BASE,
+      }),
+    )
+  } catch (error) {
+    console.error('[cadastro] erro não tratado:', error instanceof Error ? error.stack ?? error.message : error)
+    return new Response(
+      JSON.stringify({
+        ok: false,
+        status: 500,
+        errors: [{ field: '(envio)', message: 'Algo deu errado do nosso lado. Tente novamente em instantes.' }],
+      }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } },
+    )
+  }
 
   return new Response(JSON.stringify(result), {
     status: result.ok ? 201 : result.status,

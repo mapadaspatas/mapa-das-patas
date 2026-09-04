@@ -1,4 +1,4 @@
-import { processConfirmation } from '../../shared/confirmation/process'
+import { processConfirmation, type ConfirmationResult } from '../../shared/confirmation/process'
 import { createDeps } from '../../shared/registration/adapters'
 
 /**
@@ -27,18 +27,33 @@ export async function onRequestPost(context: { request: Request, env: Confirmati
     payload = undefined
   }
 
-  const result = await processConfirmation(
-    payload,
-    createDeps({
-      githubToken: context.env.GITHUB_TOKEN,
-      githubRepo: context.env.GITHUB_REPO,
-      turnstileSecret: context.env.TURNSTILE_SECRET,
-      // Sem valor padrão, e nunca um segredo embutido: o adaptador passa string
-      // vazia adiante e o núcleo reprova todo token, inclusive os legítimos.
-      confirmationSecret: context.env.CONFIRMATION_SECRET,
-      baseBranch: context.env.BRANCH_BASE,
-    }),
-  )
+  // Mesma trava do Cadastro: exception que escapa vira tela sem aviso.
+  let result: ConfirmationResult
+  try {
+    result = await processConfirmation(
+      payload,
+      createDeps({
+        githubToken: context.env.GITHUB_TOKEN,
+        githubRepo: context.env.GITHUB_REPO,
+        turnstileSecret: context.env.TURNSTILE_SECRET,
+        // Sem valor padrão, e nunca um segredo embutido: o adaptador passa string
+        // vazia adiante e o núcleo reprova todo token, inclusive os legítimos.
+        confirmationSecret: context.env.CONFIRMATION_SECRET,
+        baseBranch: context.env.BRANCH_BASE,
+      }),
+    )
+  } catch (error) {
+    console.error('[confirmacao] erro não tratado:', error instanceof Error ? error.stack ?? error.message : error)
+    return new Response(
+      JSON.stringify({
+        ok: false,
+        status: 500,
+        reason: 'envio',
+        message: 'Algo deu errado do nosso lado. Tente novamente em instantes.',
+      }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } },
+    )
+  }
 
   return new Response(JSON.stringify(result), {
     status: result.ok ? 201 : result.status,
