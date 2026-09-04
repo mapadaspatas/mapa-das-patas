@@ -1,0 +1,11 @@
+# Revisão obrigatória dos caminhos onde um merge errado quebra a confiança do
+# diretório: os dados das Iniciativas, as imagens que elas publicam, o schema
+# que valida tudo isso e a própria CI.
+#
+# Vale a última regra que casar com o arquivo. O time precisa de permissão
+# Write: com Read ou Triage o GitHub não atribui dono nenhum, em silêncio.
+
+/content/                     @mapadaspatas/moderadores
+/public/imagens/iniciativas/  @mapadaspatas/moderadores
+/shared/schema/               @mapadaspatas/moderadores
+/.github/workflows/           @mapadaspatas/moderadores
