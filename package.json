@@ -16,6 +16,7 @@
     "validate": "node scripts/validate-initiatives.ts",
     "build:mapa": "node scripts/build-uf-map.ts",
     "build:logo": "node scripts/build-logo.ts",
+    "build:social": "node scripts/build-social.ts",
     "token": "node scripts/mint-confirmation-token.ts",
     "test": "vitest run",
     "test:watch": "vitest"
