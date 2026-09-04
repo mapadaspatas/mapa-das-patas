@@ -1,0 +1,14 @@
+nome: SOS Gatinhos do Parque
+tipo: projeto-informal
+estado: MG
+cidade: Belo Horizonte
+descricao: Iniciativa de proteção animal em Belo Horizonte (MG). Informações
+  reunidas pela comunidade a partir de fontes públicas. Ajude pelos canais
+  oficiais.
+especies:
+  - gatos
+redes:
+  instagram: sosgatinhosdoparque
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/sosgatinhosdoparque

@@ -1,0 +1,14 @@
+nome: Operação Nazário
+tipo: projeto-informal
+estado: RS
+cidade: Canoas
+descricao: Iniciativa de proteção animal em Canoas (RS). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+redes:
+  instagram: sosoperacaonazario
+doacoes:
+  - tipo: apoio-recorrente
+    url: https://apoia.se/sosnazario
+    fonte: https://instagram.com/sosoperacaonazario
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/sosoperacaonazario

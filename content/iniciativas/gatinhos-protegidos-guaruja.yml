@@ -1,0 +1,13 @@
+nome: Gatinhos Protegidos Guarujá
+tipo: projeto-informal
+estado: SP
+cidade: Guarujá
+descricao: Iniciativa de proteção animal em Guarujá (SP). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+especies:
+  - gatos
+redes:
+  instagram: gatinhosprotegidosgja
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/gatinhosprotegidosgja

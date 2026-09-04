@@ -1,0 +1,14 @@
+nome: Grupo Miau AuAu
+tipo: projeto-informal
+estado: GO
+cidade: Goiânia
+descricao: Iniciativa de proteção animal em Goiânia (GO). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+especies:
+  - gatos
+  - caes
+redes:
+  instagram: grupomiauauau
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/grupomiauauau

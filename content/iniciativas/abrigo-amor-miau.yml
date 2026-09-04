@@ -1,0 +1,14 @@
+nome: Abrigo Amor Miau
+tipo: abrigo-santuario
+estado: CE
+cidade: Maranguape
+descricao: Iniciativa de proteção animal em Maranguape (CE). Informações
+  reunidas pela comunidade a partir de fontes públicas. Ajude pelos canais
+  oficiais.
+especies:
+  - gatos
+redes:
+  instagram: amor_miau_
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/amor_miau_

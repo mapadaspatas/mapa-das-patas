@@ -1,0 +1,15 @@
+nome: Gatil Miau Feliz
+tipo: abrigo-santuario
+estado: BA
+cidade: Alagoinhas
+descricao: Iniciativa de proteção animal em Alagoinhas (BA). Informações
+  reunidas pela comunidade a partir de fontes públicas. Ajude pelos canais
+  oficiais.
+especies:
+  - gatos
+redes:
+  instagram: gatilmiaufeliz
+doacoes:
+  - tipo: pix-cnpj
+    chave: 31.969.484/0001-05
+    fonte: https://instagram.com/gatilmiaufeliz

@@ -1,0 +1,14 @@
+nome: Gatil Irmã Francisca
+tipo: abrigo-santuario
+estado: BA
+cidade: Salvador
+descricao: Iniciativa de proteção animal em Salvador (BA). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+especies:
+  - gatos
+redes:
+  instagram: gatilirmafrancisca
+  linktree: https://linktr.ee/gatilirmafrancisca
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/gatilirmafrancisca

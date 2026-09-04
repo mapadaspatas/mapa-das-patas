@@ -1,0 +1,12 @@
+nome: Associação Bichinho Carente
+tipo: associacao
+estado: PB
+cidade: Sousa
+descricao: Iniciativa de proteção animal em Sousa (PB). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+redes:
+  instagram: bichinho_carente
+doacoes:
+  - tipo: pix-cnpj
+    chave: 50.936.993/0001-86
+    fonte: https://instagram.com/bichinho_carente

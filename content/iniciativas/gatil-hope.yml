@@ -1,0 +1,14 @@
+nome: Gatil Hope
+tipo: abrigo-santuario
+estado: PA
+cidade: Marituba
+descricao: Resgate e cuidado de gatos em situação de rua na região de Marituba,
+  com adoção responsável e campanhas de castração.
+especies:
+  - gatos
+redes:
+  instagram: gatilhope
+  linktree: https://linktr.ee/gatilhope
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/gatilhope

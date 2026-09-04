@@ -1,0 +1,13 @@
+nome: Instituto SOS 4 Patas Paraná
+tipo: ong
+estado: PR
+cidade: Curitiba
+descricao: Iniciativa de proteção animal em Curitiba (PR). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+redes:
+  instagram: sos4patas.pr
+  site: https://institutosos4patasparana.org
+doacoes:
+  - tipo: pix-cnpj
+    chave: 40.911.164/0001-95
+    fonte: https://instagram.com/sos4patas.pr

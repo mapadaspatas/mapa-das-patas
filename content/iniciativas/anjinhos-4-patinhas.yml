@@ -1,0 +1,16 @@
+nome: Anjinhos 4 Patinhas
+tipo: projeto-informal
+estado: AL
+cidade: Paulo Jacinto
+descricao: Iniciativa de proteção animal em Paulo Jacinto (AL). Informações
+  reunidas pela comunidade a partir de fontes públicas. Ajude pelos canais
+  oficiais.
+redes:
+  instagram: anjinhos4patinhasreserva
+doacoes:
+  - tipo: pix-cnpj
+    chave: 31.696.864/0001-13
+    fonte: https://instagram.com/anjinhos4patinhasreserva
+  - tipo: apoio-recorrente
+    url: https://apoia.se/anjinhos4patinhas
+    fonte: https://instagram.com/anjinhos4patinhasreserva

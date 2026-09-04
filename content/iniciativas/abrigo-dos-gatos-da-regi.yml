@@ -1,0 +1,14 @@
+nome: Abrigo dos gatos da Regi
+tipo: abrigo-santuario
+estado: PR
+cidade: Paiçandu
+descricao: Iniciativa de proteção animal em Paiçandu (PR). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+especies:
+  - gatos
+redes:
+  instagram: abrigodosgatosdaregi
+doacoes:
+  - tipo: pix-cnpj
+    chave: 46.924.273/0001-23
+    fonte: https://instagram.com/abrigodosgatosdaregi

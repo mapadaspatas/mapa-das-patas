@@ -1,0 +1,13 @@
+nome: Santuário Felino Maringá
+tipo: abrigo-santuario
+estado: PR
+cidade: Maringá
+descricao: Iniciativa de proteção animal em Maringá (PR). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+especies:
+  - gatos
+redes:
+  instagram: santuariofelinomga
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/santuariofelinomga

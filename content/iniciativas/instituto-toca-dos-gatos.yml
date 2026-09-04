@@ -1,0 +1,14 @@
+nome: Instituto Toca dos Gatos
+tipo: ong
+estado: SP
+cidade: São José do Rio Preto
+descricao: Iniciativa de proteção animal em São José do Rio Preto (SP).
+  Informações reunidas pela comunidade a partir de fontes públicas. Ajude pelos
+  canais oficiais.
+especies:
+  - gatos
+redes:
+  instagram: instituto.toca_dosgatos
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/instituto.toca_dosgatos

@@ -1,0 +1,14 @@
+nome: Recanto dos Felinos
+tipo: abrigo-santuario
+estado: CE
+cidade: Fortaleza
+descricao: Iniciativa de proteção animal em Fortaleza (CE). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+especies:
+  - gatos
+redes:
+  instagram: recanto_dosfelinosoficial
+doacoes:
+  - tipo: pix-cnpj
+    chave: 28.101.042/0001-38
+    fonte: https://instagram.com/recanto_dosfelinosoficial

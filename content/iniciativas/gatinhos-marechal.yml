@@ -1,0 +1,13 @@
+nome: Gatinhos Marechal
+tipo: projeto-informal
+estado: PI
+cidade: Teresina
+descricao: Iniciativa de proteção animal em Teresina (PI). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+especies:
+  - gatos
+redes:
+  instagram: gatinhosdamarechal
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/gatinhosdamarechal

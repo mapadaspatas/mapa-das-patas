@@ -1,0 +1,13 @@
+nome: Ong Abraça Vidas
+tipo: ong
+estado: SP
+cidade: Araraquara
+descricao: Iniciativa de proteção animal em Araraquara (SP). Informações
+  reunidas pela comunidade a partir de fontes públicas. Ajude pelos canais
+  oficiais.
+redes:
+  instagram: ongabracavidas
+doacoes:
+  - tipo: pix-cnpj
+    chave: 44.707.136/0001-01
+    fonte: https://instagram.com/ongabracavidas

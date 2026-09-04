@@ -1,0 +1,14 @@
+nome: Gatil Gigi
+tipo: abrigo-santuario
+estado: SP
+cidade: Caieiras
+descricao: Iniciativa de proteção animal em Caieiras (SP). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+especies:
+  - gatos
+redes:
+  instagram: gatilgigi
+  facebook: https://facebook.com/gatilgigi
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/gatilgigi

@@ -1,0 +1,15 @@
+nome: Balaio de Gato
+tipo: projeto-informal
+estado: MG
+cidade: Belo Horizonte
+descricao: Iniciativa de proteção animal em Belo Horizonte (MG). Informações
+  reunidas pela comunidade a partir de fontes públicas. Ajude pelos canais
+  oficiais.
+especies:
+  - gatos
+redes:
+  instagram: balaiodegato.bgi
+doacoes:
+  - tipo: pix-cnpj
+    chave: 23.786.126/0001-39
+    fonte: https://instagram.com/balaiodegato.bgi

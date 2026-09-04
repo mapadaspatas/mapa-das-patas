@@ -1,0 +1,14 @@
+nome: Abrigo dos Anjos
+tipo: abrigo-santuario
+estado: MG
+cidade: Uberaba
+descricao: Iniciativa de proteção animal em Uberaba (MG). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+especies:
+  - caes
+redes:
+  instagram: abrigodosanjosoficial
+doacoes:
+  - tipo: pix-cnpj
+    chave: 23.785.379/0001-98
+    fonte: https://instagram.com/abrigodosanjosoficial

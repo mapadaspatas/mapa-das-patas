@@ -1,0 +1,14 @@
+nome: Salve Gatos
+tipo: projeto-informal
+estado: MS
+cidade: Campo Grande
+descricao: Iniciativa de proteção animal em Campo Grande (MS). Informações
+  reunidas pela comunidade a partir de fontes públicas. Ajude pelos canais
+  oficiais.
+especies:
+  - gatos
+redes:
+  instagram: salvegatos
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/salvegatos

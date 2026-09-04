@@ -1,0 +1,13 @@
+nome: Mansão dos Cats
+tipo: abrigo-santuario
+estado: SP
+cidade: Osasco
+descricao: Iniciativa de proteção animal em Osasco (SP). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+especies:
+  - gatos
+redes:
+  instagram: mansaodoscats
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/mansaodoscats

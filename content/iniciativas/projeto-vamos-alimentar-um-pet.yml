@@ -1,0 +1,11 @@
+nome: Projeto Vamos Alimentar Um Pet
+tipo: projeto-informal
+estado: BA
+cidade: Salvador
+descricao: Iniciativa de proteção animal em Salvador (BA). Informações reunidas
+  pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
+redes:
+  instagram: vamosalimentarumpet
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/vamosalimentarumpet
