@@ -49,7 +49,7 @@ export type ConfirmationFailure =
 
 export type ConfirmationResult =
   | { ok: true, action: ConfirmationAction, prUrl: string }
-  | { ok: false, status: 400 | 403 | 404 | 409 | 502, reason: ConfirmationFailure, message: string }
+  | { ok: false, status: 400 | 403 | 404 | 409 | 500 | 503, reason: ConfirmationFailure, message: string }
 
 /*
  * `strictObject`: o corpo tem três campos e só. Um payload que venha com
@@ -63,7 +63,7 @@ const payloadSchema = z.strictObject({
 })
 
 function fail(
-  status: 400 | 403 | 404 | 409 | 502,
+  status: 400 | 403 | 404 | 409 | 500 | 503,
   reason: ConfirmationFailure,
   message: string,
 ): ConfirmationResult {
@@ -102,7 +102,10 @@ function verifiedPullRequest(
     // Espalhar o publicado preserva a ordem das chaves e qualquer campo que o
     // schema não conheça; só `verificado` é escrito por aqui.
     updated = { ...(parse(yaml) as Record<string, unknown>), verificado: { em: today, canal } }
-  } catch {
+  } catch (error) {
+    // O 500 que sai daqui não diz qual Iniciativa nem o quê. O YAML é público
+    // (está no repositório e no site), então a mensagem pode ir inteira.
+    console.error(`[confirmacao] YAML ilegível em ${slug}.yml:`, error instanceof Error ? error.message : error)
     return undefined
   }
 
@@ -152,7 +155,11 @@ function removalPullRequest(
   let imagem: unknown
   try {
     imagem = (parse(yaml) as Record<string, unknown> | null)?.imagem
-  } catch {
+  } catch (error) {
+    // Não interrompe o pedido de saída, de propósito. Mas a imagem sobra no
+    // repositório depois do merge e alguém tem de apagar à mão — sem log, nada
+    // avisa que isso aconteceu.
+    console.warn(`[confirmacao] YAML ilegível em ${slug}.yml, imagem não será apagada:`, error instanceof Error ? error.message : error)
     imagem = undefined
   }
 
@@ -168,7 +175,9 @@ function removalPullRequest(
     removedFile = removalOf(parseRemovals(removedYaml), slug)
       ? removedYaml
       : appendRemoval(removedYaml, { slug, em: today, pedido: 'oposicao' })
-  } catch {
+  } catch (error) {
+    // `removidos.yml` ilegível bloqueia TODO pedido de saída, não só este.
+    console.error('[confirmacao] removidos.yml ilegível:', error instanceof Error ? error.message : error)
     return undefined
   }
 
@@ -245,7 +254,9 @@ export async function processConfirmation(
   }
   if (!input) {
     return fail(
-      502,
+      // Não é transitório: o YAML publicado está fora de forma e vai continuar
+      // assim no próximo clique. 503 prometeria "tente mais tarde" à toa.
+      500,
       'envio',
       'Não conseguimos preparar seu pedido: há algo fora do lugar no cadastro desta '
       + 'iniciativa. Responda a mensagem em que você recebeu este link que a gente resolve.',
@@ -265,6 +276,10 @@ export async function processConfirmation(
     if (error instanceof BranchExistsError) {
       return fail(409, 'em-revisao', 'Já recebemos este pedido: ele está em revisão.')
     }
-    return fail(502, 'envio', 'Não foi possível registrar seu pedido agora. Tente novamente em instantes.')
+    // Mesmo motivo do Cadastro: sem log, este 503 chega vazio ao painel.
+    console.error(`[confirmacao] ${request.data.action} de ${slug}: createPullRequest falhou:`, error instanceof Error ? error.message : error)
+    // 503 pelo mesmo motivo do Cadastro: 502 da origem a Cloudflare troca pela
+    // página de erro dela e o corpo com esta mensagem não chega à tela.
+    return fail(503, 'envio', 'Não foi possível registrar seu pedido agora. Tente novamente em instantes.')
   }
 }

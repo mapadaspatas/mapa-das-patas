@@ -72,7 +72,7 @@ export interface FieldError {
 
 export type RegistrationResult =
   | { ok: true, prUrl: string }
-  | { ok: false, status: 400 | 403 | 422 | 502, errors: FieldError[] }
+  | { ok: false, status: 400 | 403 | 422 | 503, errors: FieldError[] }
 
 const payloadSchema = z.object({
   initiative: z.unknown(),
@@ -152,7 +152,7 @@ export async function processRegistration(
    * GitHub: cadastro novo não pode cair sobre YAML existente (seria sobrescrever
    * outra Iniciativa) e correção só vale sobre YAML que existe (senão um
    * `existingSlug` qualquer viraria um cadastro disfarçado de correção).
-   * Nos dois casos é erro de campo com instrução, não 502 genérico.
+   * Nos dois casos é erro de campo com instrução, não 503 genérico.
    */
   const yamlPath = `content/iniciativas/${slug}.yml`
   const alreadyPublished = await deps.fileExists(yamlPath)
@@ -209,10 +209,25 @@ export async function processRegistration(
       allowOverwrite: isCorrection,
     })
     return { ok: true, prUrl: url }
-  } catch {
+  } catch (error) {
+    /*
+     * Pages Function só registra `console.*` e exception não tratada, e o log é
+     * em tempo real (nada fica retido). Sem esta linha o 503 chega ao painel sem
+     * a mensagem do adaptador — que é onde está o status do GitHub (409 de sha
+     * desatualizado, 403 de escopo do token) que explica a falha. Só a mensagem
+     * do erro: o payload tem chave PIX e não entra em log.
+     */
+    console.error(`[cadastro] ${action} de ${slug}: createPullRequest falhou:`, error instanceof Error ? error.message : error)
     return {
       ok: false,
-      status: 502,
+      /*
+       * 503 e não 502: a Cloudflare substitui a resposta de 502/504 da origem
+       * pela página de erro dela (docs "Error 502 or 504"), e aí este corpo —
+       * com a mensagem que o formulário mostra — nunca chega ao navegador. O
+       * 503 passa direto, e é o que a falha é de verdade: o GitHub não
+       * respondeu, tentar de novo em instantes pode dar certo.
+       */
+      status: 503,
       errors: [{ field: '(envio)', message: 'Não foi possível abrir o cadastro agora. Tente novamente em instantes.' }],
     }
   }
