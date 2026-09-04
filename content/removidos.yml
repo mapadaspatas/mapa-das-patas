@@ -1,0 +1,15 @@
+# Iniciativas que pediram para sair do diretório (LGPD art. 18: oposição/eliminação).
+#
+# Registro mínimo e declarado em /privacidade: só o slug e a data do pedido,
+# nunca os dados de contato. Existe para uma coisa só: impedir que um cadastro
+# futuro, de boa-fé, recoloque no site quem pediu para sair.
+#
+# Regra para Moderador: antes de aprovar um Cadastro, confira se o slug está aqui.
+# Nunca reverta a remoção de uma Iniciativa listada.
+#
+# Formato:
+# - slug: nome-da-iniciativa
+#   em: 2026-08-22
+#   pedido: oposicao   # ou: eliminacao (reescreve o histórico, ver docs/adr/0005)
+
+removidos: []

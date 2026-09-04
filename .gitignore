@@ -1,0 +1,18 @@
+# Dependências e build
+node_modules
+.nuxt
+.output
+.data
+dist
+
+# Logs e caches locais
+*.log
+.DS_Store
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Editores e IDEs
+.idea

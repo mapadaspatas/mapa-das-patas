@@ -1,0 +1,158 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/**
+ * Identidade do Mapa das Patas.
+ *
+ * Duas regras sustentam tudo o que vem abaixo:
+ *
+ * 1. A cor carrega informação, não decoração. O laranja é a marca, o verde é
+ *    confiança (Fonte, chave conferida), e as cinco cores de Tipo existem
+ *    porque Tipo é, junto com o lugar, o único campo preenchido nas 68
+ *    Iniciativas — dá para varrer a listagem por ele.
+ * 2. O monoespaçado marca fato conferível: sigla de UF, cidade, CNPJ, código
+ *    PIX, domínio da Fonte, data de verificação. O resto é voz humana.
+ */
+
+/*
+ * `static` é obrigatório aqui: sem ele o Tailwind só emite as variáveis que vê
+ * usadas em utilitários, e as escalas urucum/mato são consumidas pelo @nuxt/ui
+ * por dentro (`--ui-primary` no claro aponta para o degrau 500, no escuro para
+ * o 400). O degrau do escuro não aparecia em nenhuma classe, era descartado, e
+ * o tema escuro ficava sem cor de marca — botão primário invisível.
+ */
+@theme static {
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Urucum: o pigmento vermelho-alaranjado da semente. Marca do site. */
+  --color-urucum-50: #FEF5F0;
+  --color-urucum-100: #FDE8DD;
+  --color-urucum-200: #FACDB6;
+  --color-urucum-300: #F6A985;
+  --color-urucum-400: #EF7A4A;
+  --color-urucum-500: #E2551F;
+  --color-urucum-600: #D6410E;
+  --color-urucum-700: #A82F07;
+  --color-urucum-800: #85280C;
+  --color-urucum-900: #6B240F;
+  --color-urucum-950: #3A0F05;
+
+  /* Mato: verde de confiança. Fonte conferida, chave publicada, selo. */
+  --color-mato-50: #F0F8F3;
+  --color-mato-100: #DCF0E4;
+  --color-mato-200: #BBE1CB;
+  --color-mato-300: #8ECBA9;
+  --color-mato-400: #5AAE81;
+  --color-mato-500: #349162;
+  --color-mato-600: #1C7A4A;
+  --color-mato-700: #16613C;
+  --color-mato-800: #134D31;
+  --color-mato-900: #103F29;
+  --color-mato-950: #072317;
+}
+
+:root {
+  --ui-radius: 0.625rem;
+
+  /*
+   * Cor por Tipo de Iniciativa.
+   *
+   * As cinco cores não são cinco hexadecimais escolhidos a olho: são a MESMA
+   * luminosidade e o MESMO croma em OKLCH, com a matiz como única variável.
+   * É isso que faz cinco matizes distantes lerem como família em vez de
+   * arco-íris — o que faz cor "não mesclar" é desencontro de luminosidade e de
+   * croma, não a distância entre as matizes. Escolher a olho, em hexadecimal,
+   * garante esse desencontro: foi o que estávamos fazendo.
+   *
+   * E o fundo do Card não é uma cor à parte: é a superfície da própria página
+   * com uma dose medida do traço dissolvida dentro. Assim ele não tem como
+   * destoar do resto da página, em nenhum dos dois temas.
+   */
+  /*
+   * L=48% é o teto: o chip é bloco sólido com tinta branca em 11px, texto
+   * normal para a WCAG, que exige 4.5:1 — a 48% dá ~4.9:1, e a 52% já cai
+   * para ~4.2:1 e reprova. O croma é o que a matiz mais fraca do conjunto
+   * (o verde) alcança nesse L dentro do sRGB; pedir mais só faria o navegador
+   * cortar o verde e desfazer a igualdade que sustenta a família.
+   */
+  --tipo-l: 48%;
+  --tipo-c: 0.14;
+  --tipo-dose: 6%;
+  --tipo-base: var(--ui-bg);
+  /* Quanto do traço vai para o filete e o ícone (o texto usa sempre o traço cheio). */
+  --tipo-filete-dose: 100%;
+}
+
+.dark {
+  /*
+   * No escuro o traço clareia e o croma cai: a mesma saturação que assenta
+   * sobre papel branco vibra sobre fundo escuro. A superfície de mistura passa
+   * a ser a elevada, para o Card ainda subir do fundo da página.
+   */
+  --tipo-l: 79%;
+  --tipo-c: 0.085;
+  --tipo-dose: 10%;
+  --tipo-base: var(--ui-bg-elevated);
+  /*
+   * No escuro o filete cheio vira uma faixa fluorescente, e são 68 delas numa
+   * tela. Meia dose deixa o Card com a cor do Tipo sem que a listagem inteira
+   * pisque — quem carrega a identificação é o chip, que tem texto junto.
+   */
+  --tipo-filete-dose: 50%;
+}
+
+/**
+ * Chip do Tipo. Precisa ser classe, e não estilo inline, porque a receita muda
+ * com o tema: no claro é bloco sólido com tinta branca; no escuro o mesmo
+ * bloco sólido seria um pastel gritando contra o fundo, então vira fundo
+ * translúcido com a tinta na própria cor do Tipo.
+ *
+ * (`--tipo` vem do ancestral `.tipo-*` e é resolvido aqui, no elemento que o
+ * consome — declará-lo com `var(--tipo)` dentro do `:root` não funcionaria.)
+ */
+.chip-tipo {
+  background: var(--tipo);
+  color: #ffffff;
+}
+.dark .chip-tipo {
+  background: color-mix(in oklab, var(--tipo) 20%, transparent);
+  color: var(--tipo);
+}
+
+/**
+ * Matiz de cada Tipo, o único valor que muda entre eles. `projeto-informal` e
+ * `abrigo-santuario` — os dois maiores grupos do diretório, 50 das 68 — caem
+ * nas matizes do urucum e do mato, as cores da própria marca.
+ */
+.tipo-protetor-independente { --tipo-h: 8; }
+.tipo-projeto-informal { --tipo-h: 45; }
+.tipo-abrigo-santuario { --tipo-h: 155; }
+.tipo-ong { --tipo-h: 245; }
+.tipo-associacao { --tipo-h: 305; }
+
+/**
+ * Classe única aplicada a qualquer elemento que represente uma Iniciativa: ela
+ * publica `--tipo` e `--tipo-bg` para os filhos, então Card, chip e filete
+ * leem a cor do mesmo lugar e nunca divergem.
+ */
+.tipo-ong,
+.tipo-associacao,
+.tipo-protetor-independente,
+.tipo-projeto-informal,
+.tipo-abrigo-santuario {
+  --tipo: oklch(var(--tipo-l) var(--tipo-c) var(--tipo-h));
+  --tipo-bg: color-mix(in oklab, var(--tipo) var(--tipo-dose), var(--tipo-base));
+  --tipo-filete: color-mix(in oklab, var(--tipo) var(--tipo-filete-dose), var(--tipo-base));
+}
+
+/**
+ * A Bricolage Grotesque tem eixo de largura, mas o @nuxt/fonts pede ao Google
+ * só o eixo de peso: o arquivo que chega ao navegador ignora `wdth`. Então o
+ * ajuste ótico dos títulos fica no espacejamento, que funciona em qualquer
+ * instância — nomes longos de Iniciativa ganham espaço sem depender do eixo.
+ */
+.font-display {
+  letter-spacing: -0.025em;
+}

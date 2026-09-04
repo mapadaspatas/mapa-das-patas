@@ -1,0 +1,40 @@
+Licença dos dados do diretório (conteúdo de `content/`)
+=========================================================
+
+Os dados do diretório de Iniciativas (os arquivos sob `content/`) são
+licenciados sob a Creative Commons Attribution 4.0 International (CC BY 4.0).
+
+Você pode copiar, redistribuir, remixar e reutilizar esses dados para qualquer
+fim, inclusive comercial, desde que dê o crédito apropriado ao projeto
+Mapa das Patas e indique se mudanças foram feitas.
+
+Texto legal completo: https://creativecommons.org/licenses/by/4.0/legalcode.pt
+Resumo legível: https://creativecommons.org/licenses/by/4.0/deed.pt-br
+
+Dados pessoais de terceiros
+---------------------------
+
+Parte destes dados é dado pessoal de pessoas físicas (protetores independentes e
+projetos informais): nome, perfil em rede social e imagem. Eles são publicados
+aqui porque a própria Iniciativa os divulgou publicamente, com a Fonte
+registrada, e para uma finalidade só: permitir que doadores encontrem e
+verifiquem quem protege animais.
+
+Chave de doação de pessoa física (CPF, e-mail, telefone) não faz parte deste
+conjunto de dados: só chave PIX de CNPJ é publicada. Versões anteriores do
+conjunto chegaram a conter e-mails usados como chave PIX; quem tiver uma cópia
+delas é o controlador do que fizer com esses dados perante a LGPD.
+
+A licença CC BY 4.0 concede direitos de autor sobre o conjunto de dados; ela não
+transfere, e não poderia transferir, as obrigações de quem trata dado pessoal.
+Quem reusa estes dados passa a ser controlador do que faz com eles perante a
+LGPD (Lei nº 13.709/2018), inclusive quanto à finalidade e aos direitos do
+titular. Reuso para prospecção comercial, disparo de mensagens ou qualquer fim
+alheio à doação contraria a finalidade declarada e a expectativa legítima de quem
+divulgou o dado.
+
+Pedidos de correção ou remoção: ver a política de privacidade do projeto
+(`content/paginas/privacidade.md`, publicada em /privacidade).
+
+O código-fonte deste repositório é licenciado separadamente sob a licença MIT
+(ver arquivo LICENSE).
