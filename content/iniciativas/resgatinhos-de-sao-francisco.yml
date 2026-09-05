@@ -1,15 +1,22 @@
 nome: Resgatinhos de São Francisco
-tipo: projeto-informal
+tipo: ong
 estado: SP
 cidade: São Paulo
 descricao: Iniciativa de proteção animal em São Paulo (SP). Informações reunidas
   pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
 especies:
   - gatos
-redes:
-  instagram: resgatinhosdesaofrancisco
-  linktree: https://linktr.ee/resgatinhosdesaofrancisco1
+  - caes
+necessidades:
+  - racao
+  - voluntarios
+  - castracao
+  - medicamentos
 doacoes:
   - tipo: pix-cnpj
     chave: 54.108.690/0001-63
     fonte: https://instagram.com/resgatinhosdesaofrancisco
+redes:
+  instagram: resgatinhosdesaofrancisco
+  linktree: https://linktr.ee/resgatinhosdesaofrancisco1
+imagem: /imagens/iniciativas/resgatinhos-de-sao-francisco.webp
