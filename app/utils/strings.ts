@@ -300,5 +300,6 @@ export const strings = {
     licenses: 'Código sob licença MIT · Dados sob CC BY 4.0',
     madeByCommunity: 'Feito pela comunidade, para quem protege animais.',
     instagramLabel: 'Instagram do Mapa das Patas',
+    githubLabel: 'GitHub do Mapa das Patas',
   },
 } as const

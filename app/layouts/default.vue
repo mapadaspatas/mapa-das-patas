@@ -39,8 +39,8 @@ const publicAnalyticsUrl = useRuntimeConfig().public.umamiPublicUrl
       Colofão: a nota de fechamento de quem fez, sob que licença e com que
       dados. Centralizado de propósito — é bloco curto, e alinhado à esquerda
       ele ficava pendurado num container largo, parecendo sobra de página. A
-      pata abre o bloco fechando o que o cabeçalho abriu com pata e nome, e o
-      Instagram o encerra: as duas únicas figuras da coluna, uma em cada ponta.
+      pata abre o bloco fechando o que o cabeçalho abriu com pata e nome, e a
+      fileira de ícones o encerra: as figuras da coluna ficam nas duas pontas.
     -->
     <footer class="border-t border-muted py-10">
       <UContainer class="flex flex-col items-center gap-5 text-center text-sm text-muted">
@@ -69,16 +69,27 @@ const publicAnalyticsUrl = useRuntimeConfig().public.umamiPublicUrl
           <p>{{ strings.footer.licenses }}</p>
         </div>
 
-        <!-- Só o ícone: o nome já está na fileira de links, via /contato -->
-        <a
-          :href="strings.contact.instagramUrl"
-          target="_blank"
-          rel="noopener"
-          :aria-label="strings.footer.instagramLabel"
-          class="text-dimmed hover:text-primary"
-        >
-          <UIcon name="i-simple-icons-instagram" class="size-5" />
-        </a>
+        <!-- Só os ícones: os nomes já estão na fileira de links, via /contato -->
+        <div class="flex items-center gap-4">
+          <a
+            :href="strings.contact.instagramUrl"
+            target="_blank"
+            rel="noopener"
+            :aria-label="strings.footer.instagramLabel"
+            class="text-dimmed hover:text-primary"
+          >
+            <UIcon name="i-simple-icons-instagram" class="size-5" />
+          </a>
+          <a
+            :href="strings.contact.githubUrl"
+            target="_blank"
+            rel="noopener"
+            :aria-label="strings.footer.githubLabel"
+            class="text-dimmed hover:text-primary"
+          >
+            <UIcon name="i-simple-icons-github" class="size-5" />
+          </a>
+        </div>
       </UContainer>
     </footer>
   </div>
