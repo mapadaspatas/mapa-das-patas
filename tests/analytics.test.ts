@@ -17,7 +17,7 @@ describe('useAnalytics', () => {
       analytics.trackCopyPix('ong-exemplo', 'key')
       analytics.trackShowQr('ong-exemplo')
       analytics.trackOpenSource('ong-exemplo', 'link_fonte')
-      analytics.trackOpenCampaign('ong-exemplo', 'https://apoia.se/ong')
+      analytics.trackOpenCampaign('ong-exemplo', 'https://apoia.se/ong', 'Apoia.se')
       analytics.trackOpenSocial('ong-exemplo', 'Instagram')
       analytics.trackShare('ong-exemplo')
       analytics.trackSearch({ search: 'gatos', state: 'SP' })
@@ -59,10 +59,18 @@ describe('useAnalytics', () => {
       contexto: 'link_fonte',
     })
 
-    analytics.trackOpenCampaign('ong-exemplo', 'https://apoia.se/ong')
+    analytics.trackOpenCampaign('ong-exemplo', 'https://apoia.se/ong', 'Apoia.se')
     expect(trackMock).toHaveBeenCalledWith('abrir_campanha', {
       iniciativa: 'ong-exemplo',
       url: 'https://apoia.se/ong',
+      plataforma: 'Apoia.se',
+    })
+
+    // Plataforma que não reconhecemos entra sem o campo, e não como "outros"
+    analytics.trackOpenCampaign('ong-exemplo', 'https://exemplo.org/campanha')
+    expect(trackMock).toHaveBeenCalledWith('abrir_campanha', {
+      iniciativa: 'ong-exemplo',
+      url: 'https://exemplo.org/campanha',
     })
 
     analytics.trackOpenSocial('ong-exemplo', 'Instagram')

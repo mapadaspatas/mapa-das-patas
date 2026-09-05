@@ -1,4 +1,5 @@
-import type { DonationType, Initiative } from '../../shared/schema/initiative'
+import { donationPlatformOf } from './donation-platforms'
+import type { Donation, DonationType, Initiative } from '../../shared/schema/initiative'
 
 /** Rótulos pt-BR dos valores canônicos do domínio (ver CONTEXT.md). */
 
@@ -63,6 +64,22 @@ export const donationLabels: Record<DonationType, string> = {
   'vaquinha': 'Vaquinha',
   'apoio-recorrente': 'Apoio recorrente',
   'paypal': 'PayPal',
+}
+
+/**
+ * Título da forma de doação, com a plataforma quando o link é de uma que
+ * reconhecemos: "Vaquinha · Vakinha", do mesmo jeito que "PIX · CNPJ" já diz de
+ * que chave se trata. Quem doa fica sabendo para onde o botão leva antes de
+ * clicar, que é a mesma promessa que a Fonte cumpre para a chave PIX.
+ *
+ * Plataforma que não reconhecemos volta só o rótulo (o link aparece por extenso
+ * logo abaixo dele, de qualquer jeito), e nome igual ao rótulo não vira
+ * "PayPal · PayPal".
+ */
+export function donationTitle(donation: Donation): string {
+  const label = donationLabels[donation.tipo]
+  const platform = 'url' in donation ? donationPlatformOf(donation.url) : undefined
+  return !platform || platform.name === label ? label : `${label} · ${platform.name}`
 }
 
 /**

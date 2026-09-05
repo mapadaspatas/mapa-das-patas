@@ -19,6 +19,9 @@ const qrOpen = ref(false)
 const pixKey = computed(() => ('chave' in props.donation ? props.donation.chave : undefined))
 const url = computed(() => ('url' in props.donation ? props.donation.url : undefined))
 
+/** Plataforma do link, quando é uma que reconhecemos (ver app/utils/donation-platforms.ts). */
+const platform = computed(() => (url.value ? donationPlatformOf(url.value) : undefined))
+
 /** Só existe para PIX com chave publicada; nada é pedido a serviço externo. */
 const brCode = computed(() => pixBrCodeOf(props.donation, props.name, props.city))
 
@@ -55,10 +58,15 @@ function onQrOpenChange(open: boolean) {
   <div class="rounded-xl bg-elevated/60 p-4">
     <div class="flex items-center justify-between gap-3">
       <span class="font-mono text-[10.5px] font-bold tracking-[0.11em] text-muted uppercase">
-        {{ donationLabels[donation.tipo] }}
+        {{ donationTitle(donation) }}
       </span>
+      <!--
+        Toda doação tem Fonte (Regra nº 1), inclusive a de campanha: até aqui o
+        link de vaquinha era o único que a escondia. `pix-na-fonte` fica de fora
+        porque abre a Fonte no botão principal, e não num atalho no canto.
+      -->
       <a
-        v-if="pixKey"
+        v-if="pixKey || url"
         :href="donation.fonte"
         target="_blank"
         rel="noopener"
@@ -131,17 +139,26 @@ function onQrOpenChange(open: boolean) {
       </div>
     </div>
 
-    <!-- Campanha externa (vaquinha, apoio recorrente, PayPal) -->
+    <!--
+      Campanha externa (vaquinha, apoio recorrente, PayPal). O link vai impresso
+      por extenso acima do botão, como em `pix-na-fonte`: a pessoa está prestes
+      a sair do site com dinheiro na mão e merece ver o destino antes do clique,
+      seja a plataforma reconhecida ou não.
+    -->
     <div v-else-if="url" class="mt-3">
+      <p class="font-mono text-xs break-all text-muted">{{ sourceLabel(url) }}</p>
       <UButton
+        class="mt-3"
         :to="url"
         target="_blank"
         color="secondary"
         size="sm"
         trailing-icon="i-lucide-external-link"
-        @click="analytics.trackOpenCampaign(slug, url)"
+        @click="analytics.trackOpenCampaign(slug, url, platform?.name)"
       >
-        {{ strings.detail.openCampaign }}
+        {{ platform
+          ? strings.detail.openCampaignOn(platform.preposition, platform.name)
+          : strings.detail.openCampaign }}
       </UButton>
     </div>
 
