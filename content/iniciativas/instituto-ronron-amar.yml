@@ -1,0 +1,26 @@
+nome: Instituto Ronron Amar
+tipo: protetor-independente
+estado: SP
+cidade: São José dos Campos
+descricao: >-
+  Em 2020 ao sonho virou realidade: a RonronAmar nasceu do sonho de resgatar
+  gatos em situação de risco e aumentar o número de lares cheios de amor com
+  nossos ronrons.
+
+  Temos uma casa que servirá como abrigo para transformar a vida de animais que
+  sofreram abandono e maus trastos. Mas para deixar ela 100% preparada para
+  receber os animais, precisamos fazer alguns ajustes, como telar as janelas,
+  consertar telhas quebradas, enfim. É aí onde vocês entram, nos ajudando
+  mensalmente a construir esse abrigo e mudar o mundo desses nenéns.
+especies:
+  - gatos
+necessidades:
+  - racao
+  - castracao
+  - medicamentos
+  - lar-temporario
+redes:
+  instagram: ronronamar
+  facebook: https://www.facebook.com/people/ronronamar/100072342502602
+  site: https://apoia.se/ronronamar
+imagem: /imagens/iniciativas/instituto-ronron-amar.webp
