@@ -1,7 +1,6 @@
 /**
  * Strings de interface centralizadas (pt-BR).
- * Nenhuma página deve hardcodar texto de UI: tudo vem daqui,
- * preparando o terreno para i18n futura sem framework agora (ver spec).
+ * Nenhuma página deve hardcodar texto de UI: tudo vem daqui.
  */
 export const strings = {
   siteName: 'Mapa das Patas',
@@ -10,16 +9,11 @@ export const strings = {
     title: 'Iniciativas',
     viewAll: 'Ver todas as iniciativas',
   },
-  /** Mapa de UFs: superfície de busca da home e da listagem. */
   map: {
     title: 'Onde estão as patas',
     hint: 'Escolha um estado',
     coverage: (initiatives: number, cities: number) =>
       `${initiatives} iniciativas · ${cities} cidades`,
-    /*
-     * O buraco no mapa é o pedido: estado vazio não é falha de quem protege
-     * animais lá, é iniciativa que ainda não chegou até aqui.
-     */
     gaps: (n: number) =>
       n === 1
         ? '1 estado ainda não tem nenhuma iniciativa cadastrada.'
@@ -31,7 +25,6 @@ export const strings = {
   },
   home: {
     title: 'Quem protege animais no Brasil, com fonte.',
-    /** O trecho de `title` que recebe a cor da marca; precisa casar com o fim dele. */
     titleAccent: 'com fonte.',
     subtitle:
       'Nenhuma chave de doação entra aqui sem o link oficial onde a própria iniciativa a divulga. Confira antes de doar.',
@@ -58,9 +51,7 @@ export const strings = {
     ctaText: 'Cadastre gratuitamente: não precisa de conta, só das informações públicas dela.',
     ctaButton: 'Cadastrar iniciativa',
   },
-  /** Verbete de uma Iniciativa na home e na listagem. */
   card: {
-    /** Rótulo da Fonte impressa no verbete: explica por que há uma URL ali. */
     source: 'fonte',
   },
   register: {
@@ -123,6 +114,15 @@ export const strings = {
     donationKeyHelp:
       'CNPJ da iniciativa, formatado enquanto você digita. Aceita também o CNPJ '
       + 'alfanumérico (ex.: 12.ABC.345/01DE-35).',
+    donationUrlPlaceholder: 'https://vakinha.com.br/…',
+    donationUrlHelp: (platforms: string) =>
+      `Link direto da campanha. Reconhecemos ${platforms} — outras plataformas de `
+      + 'financiamento coletivo também valem, o link aparece por extenso na página.',
+    platformMismatchTitle: (platform: string) => `Reconhecemos esse link: ${platform}`,
+    platformMismatchText: (platform: string, expected: string) =>
+      `${platform} costuma receber doação como "${expected}". Confira o tipo escolhido para o `
+      + 'doador encontrar o que a página prometeu.',
+    useDonationType: (expected: string) => `Usar "${expected}"`,
     donationSource: 'Fonte (link oficial onde a chave aparece)',
     addDonation: 'Adicionar forma de doação',
     removeDonation: 'Remover',
@@ -130,10 +130,6 @@ export const strings = {
     personalKeyWarningText:
       'Só publicamos CNPJ como chave PIX. CPF, e-mail e telefone identificam uma pessoa, e não são republicados aqui. Use a opção "PIX (no canal oficial)": mostramos ao doador o link oficial onde a chave está.',
     usePixAtSource: 'Usar PIX no canal oficial',
-    /*
-     * O envio abre um PR público e permanente: quem preenche o formulário
-     * precisa saber disso ANTES de apertar o botão, não na política.
-     */
     publicNoticeTitle: 'O que você enviar fica público',
     publicNoticeText:
       'O cadastro vira uma proposta pública no repositório do projeto, com tudo o que você digitou e enviou, inclusive a imagem, e o registro é permanente mesmo se a proposta for recusada. Não pedimos o seu nome nem o seu contato: envie só dados que a própria iniciativa já divulga publicamente.',
@@ -156,7 +152,6 @@ export const strings = {
     typeFilter: 'Tipo',
     speciesFilter: 'Espécie',
     needFilter: 'Necessidade',
-    /** "Todos"/"Todas": o gênero acompanha o substantivo do filtro em pt-BR. */
     allMasculine: 'Todos',
     allFeminine: 'Todas',
     results: (n: number) => (n === 1 ? '1 iniciativa encontrada' : `${n} iniciativas encontradas`),
@@ -179,15 +174,12 @@ export const strings = {
     codeCopied: 'Código copiado!',
     viewSource: 'Ver na fonte',
     sourceExplanation: 'Toda chave publicada aqui aparece também no canal oficial da iniciativa. Confira antes de doar.',
-    /*
-     * Chave de pessoa física não é republicada (ver ADR 0006). O texto diz a
-     * regra como o que é — uma decisão nossa — e nunca como uma falta da
-     * Iniciativa: quem lê está prestes a doar para ela.
-     */
     pixAtSource: 'Pegue a chave com a própria iniciativa',
     openOfficialChannel: 'Abrir o canal oficial',
     keyPolicy: 'Só publicamos chave PIX de CNPJ. As demais ficam com a iniciativa, no canal dela.',
     openCampaign: 'Abrir campanha',
+    openCampaignOn: (preposition: string, platform: string) =>
+      `Abrir ${preposition} ${platform}`,
     needs: 'Como ajudar além do PIX',
     social: 'Redes e canais',
     noDonations: 'Esta iniciativa ainda não tem canais de doação cadastrados.',
@@ -203,12 +195,6 @@ export const strings = {
     verified: 'Verificada',
     verifiedOn: (date: string) => `Dados confirmados pela iniciativa em ${date}`,
   },
-  /*
-   * Confirmação por link (/confirmar/<slug>). Quem lê é a própria Iniciativa,
-   * que na maioria das vezes descobre aqui que está no site: o texto diz de
-   * onde veio o dado e oferece a saída antes de pedir a confirmação, na mesma
-   * ordem de `docs/mensagens-para-iniciativas.md`. Nada de jargão de GitHub.
-   */
   confirm: {
     title: 'Conferir os dados desta iniciativa',
     subtitle: (name: string) =>
@@ -239,7 +225,6 @@ export const strings = {
     leaveText:
       'A página sai do ar na próxima publicação, sem perguntar o motivo e sem precisar de justificativa. Fica só o registro do endereço da página e da data, sem nenhum dado de contato de vocês, para que outra pessoa não cadastre vocês de novo depois.',
     leaveAction: 'Quero sair do site',
-    /* Sair bloqueia recadastro futuro: um clique errado aqui não tem desfazer. */
     leaveConfirmText: 'Tem certeza? Depois de sair, ninguém pode recadastrar esta página.',
     leaveConfirmAction: 'Sim, podem tirar',
     leaveCancel: 'Cancelar',
@@ -256,11 +241,6 @@ export const strings = {
     failureTitle: 'Não deu para registrar',
     privacyLink: 'Como tratamos dados pessoais',
   },
-  /*
-   * A página de contato roteia em vez de atender: cada situação termina no
-   * caminho mais curto para ela, e o e-mail fica para os dois casos que
-   * precisam de canal privado (pedido de titular e Selo Verificado).
-   */
   contact: {
     title: 'Contato',
     subtitle:
@@ -287,13 +267,6 @@ export const strings = {
     },
     channelsTitle: 'Canais do projeto',
     emailLabel: 'E-mail',
-    /*
-     * Endereço dedicado do projeto (decidido no ticket 13). Fica fixo aqui, e
-     * não em variável de ambiente, porque a `/privacidade` precisa publicar o
-     * mesmo endereço em texto e um arquivo markdown não acompanha env: uma
-     * variável sobrescrita faria a página com valor legal mentir. O
-     * `tests/privacy-page.test.ts` amarra os dois.
-     */
     email: 'contato@mapadaspatas.com.br',
     instagramLabel: 'Instagram',
     instagramHandle: '@mapadaspatas',
@@ -302,11 +275,6 @@ export const strings = {
     githubRepo: 'mapadaspatas/mapa-das-patas',
     githubUrl: 'https://github.com/mapadaspatas/mapa-das-patas',
     githubIssuesUrl: 'https://github.com/mapadaspatas/mapa-das-patas/issues',
-    /*
-     * O site não pede contato de ninguém em lugar nenhum (ver o aviso do
-     * formulário de cadastro); dizer isso aqui evita que a página de contato
-     * seja lida como convite a mandar mais dado do que o necessário.
-     */
     dataNote:
       'Escreva só o que o pedido precisa. Não pedimos nem guardamos dado pessoal de quem entra em contato além do que você mesmo mandar na mensagem.',
   },
@@ -331,7 +299,6 @@ export const strings = {
   footer: {
     licenses: 'Código sob licença MIT · Dados sob CC BY 4.0',
     madeByCommunity: 'Feito pela comunidade, para quem protege animais.',
-    /** Ícone sem texto: o rótulo vive aqui para leitor de tela. */
     instagramLabel: 'Instagram do Mapa das Patas',
   },
 } as const

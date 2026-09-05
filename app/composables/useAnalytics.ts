@@ -58,10 +58,17 @@ export function useAnalytics() {
     })
   }
 
-  function trackOpenCampaign(slug: string, url?: string) {
+  /*
+   * A plataforma vai junto da URL para o painel conseguir somar "quanto o
+   * Vakinha recebe" sem agrupar URL a URL — cada campanha tem a sua. Link de
+   * plataforma que não reconhecemos não gera o campo: melhor a lacuna do que um
+   * balde "outros" que soma o que não tem nada a ver.
+   */
+  function trackOpenCampaign(slug: string, url?: string, platform?: string) {
     track('abrir_campanha', {
       iniciativa: slug,
       ...(url ? { url } : {}),
+      ...(platform ? { plataforma: platform } : {}),
     })
   }
 

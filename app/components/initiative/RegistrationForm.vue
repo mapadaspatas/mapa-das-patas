@@ -13,6 +13,7 @@ import {
   usesDonationUrl,
 } from '~~/shared/schema/initiative'
 import type { Collections } from '@nuxt/content'
+import type { DonationType } from '~~/shared/schema/initiative'
 import type { FieldError, RegistrationResult } from '~~/shared/registration/process'
 
 /*
@@ -213,6 +214,35 @@ function switchToPixAtSource(row: DonationRow) {
   row.type = 'pix-na-fonte'
   row.key = ''
   keyBeingTyped.value = null
+}
+
+/** Plataformas reconhecidas, ditas como frase para a ajuda do campo de link. */
+const knownPlatforms = donationPlatformNames.join(', ').replace(/, ([^,]+)$/, ' e $1')
+
+/**
+ * Plataforma reconhecida no link de cada linha cujo tipo habitual não é o
+ * escolhido ali — Apoia.se marcado como vaquinha, por exemplo, que faria a
+ * página prometer ao doador uma doação única e entregar uma assinatura.
+ *
+ * É sugestão e não validação, com a mesma forma do aviso de chave pessoal: diz o
+ * que reconheceu e oferece a troca. O schema aceita a combinação de qualquer
+ * jeito (plataforma muda de produto, e a Iniciativa sabe da dela mais do que
+ * nós), e plataforma que não reconhecemos nunca gera aviso.
+ *
+ * Vem por índice, e não por chamada no template, para o link ser parseado uma
+ * vez por linha em vez de uma vez por prop do alerta.
+ */
+const platformHints = computed(() =>
+  form.donations.map((row) => {
+    if (!usesDonationUrl(row.type)) return undefined
+    const platform = donationPlatformOf(row.url.trim())
+    if (!platform?.donationType || platform.donationType === row.type) return undefined
+    return { name: platform.name, type: platform.donationType }
+  }),
+)
+
+function useSuggestedType(row: DonationRow, type: DonationType) {
+  row.type = type
 }
 
 /**
@@ -528,10 +558,29 @@ async function startOver() {
               v-if="usesDonationUrl(row.type)"
               :label="t.donationUrl"
               required
+              :help="t.donationUrlHelp(knownPlatforms)"
               :error="errorFor(`doacoes.${i}.url`)"
             >
-              <UInput v-model="row.url" placeholder="https://…" class="w-full" />
+              <UInput v-model="row.url" :placeholder="t.donationUrlPlaceholder" class="w-full" />
             </UFormField>
+
+            <UAlert
+              v-if="platformHints[i]"
+              color="warning"
+              variant="subtle"
+              icon="i-lucide-info"
+              :title="t.platformMismatchTitle(platformHints[i]!.name)"
+              :description="t.platformMismatchText(
+                platformHints[i]!.name,
+                donationLabels[platformHints[i]!.type],
+              )"
+              :actions="[{
+                label: t.useDonationType(donationLabels[platformHints[i]!.type]),
+                color: 'warning',
+                variant: 'solid',
+                onClick: () => useSuggestedType(row, platformHints[i]!.type),
+              }]"
+            />
 
             <UFormField
               :label="t.donationSource"
