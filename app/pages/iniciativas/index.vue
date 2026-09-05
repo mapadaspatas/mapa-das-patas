@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { initiativeTypes, needs as needValues, species as speciesValues } from '~~/shared/schema/initiative'
+import { initiativeTypes, needs as needValues, species as speciesValues } from '~~/shared/schema/vocabulary'
 import type { Filters } from '~/utils/filter'
 import { ufShapes } from '~/utils/uf-map'
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cnpjChars, formatCnpj, isCnpjMaskable } from '~~/shared/cnpj'
 import {
+  citiesOf,
   donationTypes,
   initiativeTypes,
   looksLikePersonalPixKey,
@@ -161,6 +162,29 @@ const prUrl = ref('')
 
 const typeOptions = initiativeTypes.map((v) => ({ label: typeLabels[v], value: v as string }))
 const stateOptions = states.map((uf) => ({ label: uf as string, value: uf as string }))
+
+/*
+ * Cidade é escolhida na lista do IBGE da UF, e não digitada: o mesmo lugar
+ * escrito de dois jeitos vira dois lugares no filtro da listagem, que monta as
+ * opções a partir do que foi publicado. O schema exige o mesmo (ver
+ * shared/schema/initiative.ts), então texto livre aqui só adiaria a recusa.
+ *
+ * A cópia é para o USelectMenu, que pede array mutável; a lista gerada é
+ * `readonly` justamente para ninguém alterá-la em outro lugar.
+ */
+const cityOptions = computed(() => [...citiesOf(form.state)])
+
+/*
+ * Trocar de estado zera a cidade: o valor anterior quase nunca existe na nova
+ * UF, e nos poucos nomes que existem nas duas (Bonito, Bom Jesus) manter a
+ * escolha antiga em silêncio seria pior — quem trocou de estado está indo para
+ * outro lugar. Em correção isto não dispara na montagem: o watch nasce depois
+ * do `form.state` receber o dado publicado, logo acima.
+ */
+watch(() => form.state, () => {
+  form.city = ''
+})
+
 const speciesOptions = speciesValues.map((v) => ({ label: speciesLabels[v], value: v as string }))
 const needOptions = needValues.map((v) => ({ label: needLabels[v], value: v as string }))
 const donationOptions = donationTypes.map((v) => ({
@@ -334,7 +358,17 @@ async function startOver() {
               <USelect v-model="form.state" :items="stateOptions" class="w-full" />
             </UFormField>
             <UFormField :label="t.city" required :error="errorFor('cidade')">
-              <UInput v-model="form.city" class="w-full" />
+              <USelectMenu
+                v-model="form.city"
+                :items="cityOptions"
+                :disabled="!form.state"
+                :placeholder="form.state ? t.cityPlaceholder : t.cityNeedsState"
+                :search-input="{ placeholder: t.citySearch }"
+                virtualize
+                class="w-full"
+              >
+                <template #empty>{{ t.cityEmpty }}</template>
+              </USelectMenu>
             </UFormField>
           </div>
           <UFormField :label="t.description" required :help="t.descriptionHelp" :error="errorFor('descricao')">

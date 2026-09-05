@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { donationTypeMetadata } from '~~/shared/schema/initiative'
+import { donationTypeMetadata } from '~~/shared/schema/vocabulary'
 
 const route = useRoute()
 const slug = route.params.slug as string

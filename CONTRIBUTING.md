@@ -6,6 +6,7 @@ Obrigado por ajudar! Este guia espelha as regras publicadas em [/como-contribuir
 
 - **Sem conta no GitHub**: use o formulário do site (`/cadastrar`). Ele abre o PR por você.
 - **Por PR direto**: crie/edite um arquivo em `content/iniciativas/<slug>.yml`. O slug é o nome do arquivo e vira a URL. O schema que valida tudo está em `shared/schema/initiative.ts`. A CI aponta qualquer problema campo a campo.
+- **Cidade**: é município do IBGE, escrito como o IBGE escreve, e do estado informado — bairro e distrito não valem (`cidade: São Paulo` numa Iniciativa de Vila Prudente, com o bairro no nome e na descrição). A CI recusa o resto: a mesma cidade em duas grafias vira dois lugares no filtro da listagem. A lista fica em `shared/municipios.ts`, gerada por `pnpm build:municipios`.
 - **Imagem** (opcional): o formulário reduz e envia junto com o cadastro. Por PR direto, adicione `public/imagens/iniciativas/<slug>.webp` (quadrado, 400px) e aponte `imagem: /imagens/iniciativas/<slug>.webp` no YAML. A CI reprova referência para arquivo inexistente.
 
 ## Regras de aprovação (aplicadas na revisão de todo PR)

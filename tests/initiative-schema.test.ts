@@ -46,6 +46,49 @@ describe('schema da Iniciativa', () => {
   })
 })
 
+/*
+ * Cidade é município do IBGE, e do estado informado. Sem esta regra o mesmo
+ * lugar entra escrito de vários jeitos e o filtro da listagem, que monta as
+ * opções a partir do que foi publicado, oferece cada grafia como um lugar.
+ */
+describe('cidade dentro da lista do IBGE', () => {
+  const parseCity = (estado: string, cidade: string) =>
+    initiativeSchema.safeParse({ ...validInitiative, estado, cidade })
+
+  it('aceita município do estado informado', () => {
+    expect(parseCity('SP', 'São Paulo').success).toBe(true)
+    expect(parseCity('RJ', 'Rio de Janeiro').success).toBe(true)
+    expect(parseCity('DF', 'Brasília').success).toBe(true)
+  })
+
+  it('rejeita município de outro estado', () => {
+    expect(parseCity('RJ', 'São Paulo').success).toBe(false)
+    expect(parseCity('SP', 'Salvador').success).toBe(false)
+  })
+
+  it('rejeita bairro e distrito, que não são município', () => {
+    expect(parseCity('SP', 'Vila Prudente').success).toBe(false)
+    expect(parseCity('RJ', 'Realengo').success).toBe(false)
+  })
+
+  it('exige o nome como o IBGE escreve', () => {
+    expect(parseCity('SP', 'Sao Paulo').success).toBe(false)
+    expect(parseCity('SP', 'são paulo').success).toBe(false)
+    expect(parseCity('SP', 'São Paulo ').success).toBe(false)
+  })
+
+  it('aponta o erro no campo cidade, e não na raiz', () => {
+    const result = parseCity('SP', 'Realengo')
+    expect(result.success).toBe(false)
+    expect(result.error?.issues.map((issue) => issue.path.join('.'))).toContain('cidade')
+  })
+
+  it('aceita o mesmo nome de cidade em estados diferentes', () => {
+    expect(parseCity('MS', 'Bonito').success).toBe(true)
+    expect(parseCity('PE', 'Bonito').success).toBe(true)
+  })
+})
+
 describe('enums fechados', () => {
   it('aceita todos os tipos de Iniciativa da spec', () => {
     for (const tipo of ['ong', 'associacao', 'protetor-independente', 'projeto-informal', 'abrigo-santuario']) {
@@ -58,7 +101,8 @@ describe('enums fechados', () => {
   })
 
   it('aceita UF brasileira válida e rejeita inválida', () => {
-    expect(initiativeSchema.safeParse({ ...validInitiative, estado: 'SP' }).success).toBe(true)
+    // A cidade acompanha a UF: a Iniciativa toda precisa continuar coerente.
+    expect(initiativeSchema.safeParse({ ...validInitiative, estado: 'SP', cidade: 'Santos' }).success).toBe(true)
     expect(initiativeSchema.safeParse({ ...validInitiative, estado: 'XX' }).success).toBe(false)
     expect(initiativeSchema.safeParse({ ...validInitiative, estado: 'sp' }).success).toBe(false)
   })
