@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { cnpjChars, formatCnpj, isCnpjMaskable } from '~~/shared/cnpj'
+import { instagramHandle } from '~~/shared/instagram'
 import {
   citiesOf,
   donationTypes,
@@ -236,8 +237,23 @@ function showsPersonalKeyWarning(row: DonationRow, index: number) {
   return looksLikePersonalPixKey(value) || looksLikePersonalPixKey(cnpjChars(value))
 }
 
+/*
+ * O campo do Instagram guarda handle, e quem preenche cola o link do app ou
+ * escreve `@nome`. Traduzimos ao sair do campo, e não a cada tecla: um handle
+ * em construção não deve ser reescrito no meio da digitação. Valor que não vira
+ * handle fica como veio, para o schema recusar com a mensagem dele.
+ */
+function normalizeSocialField(field: keyof typeof form.social) {
+  if (field !== 'instagram') return
+  form.social.instagram = instagramHandle(form.social.instagram) ?? form.social.instagram
+}
+
 /** Monta o objeto no formato de dados publicado (campos em pt-BR). */
 function buildInitiative() {
+  // O blur cobre o caminho normal; aqui é a rede de segurança do envio que
+  // acontece sem o campo nunca ter perdido o foco.
+  normalizeSocialField('instagram')
+
   const redes = Object.fromEntries(
     Object.entries(form.social).filter(([, value]) => value.trim()),
   )
@@ -448,7 +464,12 @@ async function startOver() {
               :help="'help' in field ? field.help : undefined"
               :error="errorFor(`redes.${field.key}`)"
             >
-              <UInput v-model="form.social[field.key]" :placeholder="field.placeholder" class="w-full" />
+              <UInput
+                v-model="form.social[field.key]"
+                :placeholder="field.placeholder"
+                class="w-full"
+                @blur="normalizeSocialField(field.key)"
+              />
             </UFormField>
           </div>
         </section>
