@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import { isCnpj } from '../cnpj.ts'
+import { municipiosPorUf } from '../municipios.ts'
+import { initiativeTypes, needs, species, states } from './vocabulary.ts'
 
 /**
  * Schema da Iniciativa: costura central do projeto (ver spec e CONTEXT.md).
@@ -10,29 +12,21 @@ import { isCnpj } from '../cnpj.ts'
  * YAMLs em content/iniciativas); o código em volta deles é em inglês.
  */
 
-export const initiativeTypes = [
-  'ong',
-  'associacao',
-  'protetor-independente',
-  'projeto-informal',
-  'abrigo-santuario',
-] as const
+/*
+ * O vocabulário sai por aqui também, para quem já valida ter um import só. Mas
+ * quem só precisa das constantes (uma página, um componente) deve importar
+ * `./vocabulary.ts` direto: este arquivo puxa o zod e os 5.571 municípios do
+ * IBGE junto, e nenhuma tela de navegação usa nada disso.
+ */
+export * from './vocabulary.ts'
 
-export const species = ['caes', 'gatos', 'cavalos', 'silvestres', 'outros'] as const
-
-export const needs = [
-  'racao',
-  'lar-temporario',
-  'voluntarios',
-  'castracao',
-  'medicamentos',
-] as const
-
-export const states = [
-  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
-  'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
-  'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
-] as const
+/**
+ * Municípios da UF, em ordem alfabética, direto da lista do IBGE (ver
+ * `scripts/build-municipios.ts`). UF que não existe devolve lista vazia, para
+ * quem chama não ter que checar antes.
+ */
+export const citiesOf = (uf: string): readonly string[] =>
+  municipiosPorUf[uf as keyof typeof municipiosPorUf] ?? []
 
 /**
  * Política de dados pessoais (ver CONTEXT.md e docs/adr/0006):
@@ -77,42 +71,6 @@ const source = z.url({ protocol: /^https?$/ }).describe(
 )
 
 const donationUrl = z.url({ protocol: /^https?$/ })
-
-export const donationTypes = [
-  'pix-cnpj',
-  'pix-na-fonte',
-  'vaquinha',
-  'apoio-recorrente',
-  'paypal',
-] as const
-
-export type DonationType = (typeof donationTypes)[number]
-
-/**
- * Forma de cada tipo de doação em um lugar só: qual campo ele publica e se é
- * PIX. O formulário lia isso de uma lista de prefixos "pix-" própria, que podia
- * divergir do schema em silêncio (ticket 11).
- *
- * A autoridade da validação continua sendo o `donationSchema` abaixo; isto
- * descreve a mesma forma para a UI, e o `satisfies` garante que nenhum tipo
- * novo entre em `donationTypes` sem passar por aqui.
- */
-export const donationTypeMetadata = {
-  'pix-cnpj': { field: 'key', isPix: true },
-  // A chave não é publicada: o site aponta para a Fonte (pessoa física)
-  'pix-na-fonte': { field: 'none', isPix: true },
-  'vaquinha': { field: 'url', isPix: false },
-  'apoio-recorrente': { field: 'url', isPix: false },
-  'paypal': { field: 'url', isPix: false },
-} as const satisfies Record<DonationType, { field: 'key' | 'url' | 'none', isPix: boolean }>
-
-/** Este tipo de doação publica uma chave PIX? */
-export const usesDonationKey = (type: string) =>
-  donationTypeMetadata[type as DonationType]?.field === 'key'
-
-/** Este tipo de doação publica um link de campanha externa? */
-export const usesDonationUrl = (type: string) =>
-  donationTypeMetadata[type as DonationType]?.field === 'url'
 
 const donationSchema = z.discriminatedUnion('tipo', [
   z.strictObject({ tipo: z.literal('pix-cnpj'), chave: cnpj, fonte: source }),
@@ -179,6 +137,19 @@ export const initiativeSchema = z.object({
   imagem: imagePath.optional(),
   verificado: verificationSchema.optional(),
 })
+  /*
+   * Cidade é município do IBGE, e do estado informado. A regra é aqui, e não só
+   * no formulário, porque o campo também chega por PR direto no YAML: sem ela,
+   * a mesma cidade entra escrita de três jeitos ("Sao Paulo", "São Paulo ",
+   * "Vila Prudente") e o filtro da listagem, que monta as opções a partir do que
+   * foi publicado, passa a oferecer as três como lugares diferentes.
+   *
+   * Ela roda depois dos campos, então `estado` já é uma UF válida aqui.
+   */
+  .refine((initiative) => citiesOf(initiative.estado).includes(initiative.cidade), {
+    path: ['cidade'],
+    message: 'cidade deve ser um município do estado informado, com o nome como o IBGE escreve (bairro e distrito não valem)',
+  })
 
 export type Donation = z.infer<typeof donationSchema>
 

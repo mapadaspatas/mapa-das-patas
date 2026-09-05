@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ConfirmationAction, ConfirmationResult } from '~~/shared/confirmation/process'
-import { donationTypeMetadata } from '~~/shared/schema/initiative'
+import { donationTypeMetadata } from '~~/shared/schema/vocabulary'
 
 /*
  * Confirmação por link (ticket 20). A página mostra exatamente o que
