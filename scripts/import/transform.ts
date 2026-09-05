@@ -1,4 +1,5 @@
 import type { Initiative } from '../../shared/schema/initiative'
+import { instagramHandle } from '../../shared/instagram'
 import { generateSlug } from '../../shared/slug'
 
 export { generateSlug }
@@ -56,10 +57,13 @@ function inferSpecies(name: string, otherLinks: string): Initiative['especies'] 
   return found.length > 0 ? found : undefined
 }
 
-function firstHandle(instagram: string): string | undefined {
-  const first = instagram.split('/')[0]?.trim().replace(/^@/, '')
-  return first && /^[A-Za-z0-9._]{1,30}$/.test(first) ? first : undefined
-}
+/*
+ * A planilha às vezes empacota dois perfis na mesma célula ("@a/@b"): fica o
+ * primeiro, e o aviso manda um humano conferir o resto. URL do Instagram tem
+ * barra por natureza e não é caso de aviso.
+ */
+const packsTwoHandles = (instagram: string) =>
+  instagram.includes('/') && !/instagram\.com/i.test(instagram)
 
 function fullUrl(link: string): string {
   return /^https?:\/\//.test(link) ? link : `https://${link}`
@@ -78,9 +82,9 @@ function classifyLink(link: string):
 
 export function transformRow(row: SpreadsheetRow): RowResult {
   const warnings: string[] = []
-  const handle = firstHandle(row.instagram)
+  const handle = instagramHandle(row.instagram)
   if (row.instagram && !handle) warnings.push(`instagram ilegível: "${row.instagram}"`)
-  if (row.instagram.includes('/')) warnings.push(`instagram com múltiplos handles: "${row.instagram}", mantido o primeiro`)
+  if (handle && packsTwoHandles(row.instagram)) warnings.push(`instagram com múltiplos handles: "${row.instagram}", mantido o primeiro`)
 
   const source = handle ? `https://instagram.com/${handle}` : undefined
 

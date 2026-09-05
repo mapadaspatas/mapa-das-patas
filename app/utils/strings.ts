@@ -98,7 +98,7 @@ export const strings = {
     socialSection: 'Redes e canais',
     socialHelp: 'Preencha as que a iniciativa tiver. Pelo menos uma ajuda na verificação.',
     socialFields: [
-      { key: 'instagram', label: 'Instagram', help: 'Só o nome de usuário, sem @', placeholder: 'nomedousuario' },
+      { key: 'instagram', label: 'Instagram', help: 'Link do perfil ou nome de usuário.', placeholder: 'nomedousuario' },
       { key: 'facebook', label: 'Facebook', placeholder: 'https://facebook.com/…' },
       { key: 'tiktok', label: 'TikTok', placeholder: 'https://tiktok.com/@…' },
       { key: 'youtube', label: 'YouTube', placeholder: 'https://youtube.com/@…' },
