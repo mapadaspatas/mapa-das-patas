@@ -34,7 +34,7 @@ export const strings = {
     /** O trecho de `title` que recebe a cor da marca; precisa casar com o fim dele. */
     titleAccent: 'com fonte.',
     subtitle:
-      'Nenhuma chave de doação entra aqui sem o link oficial onde a própria iniciativa a divulga. Confira antes de doar.',
+      'Um diretório comunitário e aberto de ONGs, abrigos e protetores independentes que cuidam de animais, em todo o Brasil. Encontre e ajude quem atua perto de você.',
     searchButton: 'Buscar',
     featuredTitle: 'Iniciativas para conhecer',
     featuredNoneVerified:
