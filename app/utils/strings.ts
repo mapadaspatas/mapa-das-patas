@@ -100,7 +100,6 @@ export const strings = {
       { key: 'site', label: 'Site', placeholder: 'https://…' },
       { key: 'linktree', label: 'Linktree / link na bio', placeholder: 'https://linktr.ee/…' },
     ],
-    pixAtOfficialChannel: 'PIX (no canal oficial)',
     sourceClearedWarning: 'Você alterou a chave. Informe a Fonte onde a nova chave aparece.',
     connectionFailure: 'Falha de conexão. Tente novamente.',
     unexpectedFailure:
@@ -110,6 +109,12 @@ export const strings = {
     sourceRule:
       'Regra nº 1: toda chave de doação precisa de uma Fonte, o link do post ou bio oficial onde a própria iniciativa divulga essa chave. Sem Fonte, o cadastro não é aprovado.',
     donationType: 'Tipo',
+    donationPix: 'PIX',
+    pixOwnerQuestion: 'A chave é de CNPJ ou de uma pessoa?',
+    pixOwnerCnpj: 'De um CNPJ',
+    pixOwnerPerson: 'De uma pessoa',
+    pixOwnerRequired: 'Escolha se a chave é de CNPJ ou de uma pessoa.',
+    pixAtSourceHelp: 'O site vai apontar para esse link; a chave não é publicada aqui.',
     donationKey: 'Chave',
     donationUrl: 'Link da campanha',
     donationKeyPlaceholder: '00.000.000/0000-00',

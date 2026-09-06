@@ -65,6 +65,14 @@ export const donationTypeMetadata = {
 export const usesDonationKey = (type: string) =>
   donationTypeMetadata[type as DonationType]?.field === 'key'
 
+/**
+ * Este tipo de doação é PIX, publicando a chave ou apontando para a Fonte? O
+ * formulário pergunta de quem é a chave antes de escolher entre os dois, então
+ * precisa tratá-los como uma coisa só até ter a resposta.
+ */
+export const isPixDonation = (type: string) =>
+  donationTypeMetadata[type as DonationType]?.isPix === true
+
 /** Este tipo de doação publica um link de campanha externa? */
 export const usesDonationUrl = (type: string) =>
   donationTypeMetadata[type as DonationType]?.field === 'url'

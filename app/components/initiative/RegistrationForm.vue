@@ -6,6 +6,7 @@ import {
   containsPersonalPixKey,
   donationTypes,
   initiativeTypes,
+  isPixDonation,
   looksLikePersonalPixKey,
   needs as needValues,
   species as speciesValues,
@@ -190,15 +191,48 @@ watch(() => form.state, () => {
 
 const speciesOptions = speciesValues.map((v) => ({ label: speciesLabels[v], value: v as string }))
 const needOptions = needValues.map((v) => ({ label: needLabels[v], value: v as string }))
-const donationOptions = donationTypes.map((v) => ({
-  label: v === 'pix-na-fonte' ? t.pixAtOfficialChannel : donationLabels[v],
-  value: v as string,
-}))
+/**
+ * PIX escolhido antes de a pessoa dizer de quem é a chave. Existe só na tela: o
+ * tipo gravado sai da resposta à pergunta ("CNPJ" vira `pix-cnpj`, "pessoa"
+ * vira `pix-na-fonte`), e o envio é recusado enquanto ela estiver sem resposta.
+ */
+const pixUndecided = 'pix'
+
+const isPixRow = (type: string) => type === pixUndecided || isPixDonation(type)
+
+/*
+ * Os dois tipos de PIX entram no seletor como uma opção só, e a pergunta "CNPJ
+ * ou pessoa" separa os dois logo abaixo. Oferecer "PIX · CNPJ" e "PIX (no canal
+ * oficial)" lado a lado é pedir a decisão antes da pergunta: quem tem chave de
+ * pessoa escolhe a de nome mais familiar e digita o CPF.
+ */
+const donationOptions = [
+  { label: t.donationPix, value: pixUndecided },
+  ...donationTypes
+    .filter((v) => !isPixDonation(v))
+    .map((v) => ({ label: donationLabels[v], value: v as string })),
+]
+
+const pixOwnerOptions = [
+  { label: t.pixOwnerCnpj, value: 'pix-cnpj' },
+  { label: t.pixOwnerPerson, value: 'pix-na-fonte' },
+]
 
 const socialFields = t.socialFields
 
 function addDonation() {
-  form.donations.push({ type: 'pix-cnpj', key: '', url: '', source: '' })
+  form.donations.push({ type: pixUndecided, key: '', url: '', source: '' })
+}
+
+/** O seletor mostra "PIX" nos dois tipos de PIX; a pergunta é que separa. */
+function donationKindOf(row: DonationRow) {
+  return isPixRow(row.type) ? pixUndecided : row.type
+}
+
+function onDonationKind(row: DonationRow, kind: string) {
+  // Reescolher "PIX" com a pergunta já respondida não apaga a resposta
+  if (kind === pixUndecided && isPixRow(row.type)) return
+  row.type = kind
 }
 
 /**
@@ -215,6 +249,16 @@ function switchToPixAtSource(row: DonationRow) {
   row.type = 'pix-na-fonte'
   row.key = ''
   keyBeingTyped.value = null
+}
+
+/**
+ * Resposta à pergunta "CNPJ ou pessoa". "Pessoa" passa pelo mesmo caminho do
+ * aviso de chave pessoal, que já limpa a chave: o que a pessoa respondeu não
+ * pode deixar para trás um CPF digitado antes da troca.
+ */
+function choosePixOwner(row: DonationRow, owner: string) {
+  if (owner === 'pix-na-fonte') switchToPixAtSource(row)
+  else row.type = owner
 }
 
 /** Plataformas reconhecidas, ditas como frase para a ajuda do campo de link. */
@@ -332,9 +376,37 @@ function personalKeyIn(text: string): string | undefined {
   return containsPersonalPixKey(text) ? t.personalKeyInText : undefined
 }
 
+/**
+ * Em `pix-na-fonte` a Fonte é a resposta à pergunta "e a chave, então?": é o
+ * link que o site publica no lugar dela. O aviso da correção, quando há, vem
+ * antes: ele fala de algo que a pessoa precisa refazer agora.
+ */
+function sourceHelp(row: DonationRow) {
+  if (row.sourceCleared) return t.sourceClearedWarning
+  return row.type === 'pix-na-fonte' ? t.pixAtSourceHelp : undefined
+}
+
+/**
+ * A pergunta "CNPJ ou pessoa" sem resposta não tem tipo de doação para gravar.
+ * A recusa é aqui, e não no schema, porque o schema falaria de um discriminador
+ * que a pessoa nunca viu: na tela dela existe uma pergunta em branco.
+ */
+function undecidedPixErrors(): FieldError[] {
+  return form.donations.flatMap((row, i) =>
+    row.type === pixUndecided
+      ? [{ field: `doacoes.${i}.tipo`, message: t.pixOwnerRequired }]
+      : [],
+  )
+}
+
 const analytics = useAnalytics()
 
 async function submit() {
+  const undecided = undecidedPixErrors()
+  if (undecided.length) {
+    errors.value = undecided
+    return
+  }
   submitting.value = true
   errors.value = []
   try {
@@ -536,7 +608,12 @@ async function startOver() {
           >
             <div class="flex items-end gap-2">
               <UFormField :label="t.donationType" class="flex-1">
-                <USelect v-model="row.type" :items="donationOptions" class="w-full" />
+                <USelect
+                  :model-value="donationKindOf(row)"
+                  :items="donationOptions"
+                  class="w-full"
+                  @update:model-value="onDonationKind(row, String($event))"
+                />
               </UFormField>
               <UButton
                 color="error"
@@ -546,6 +623,20 @@ async function startOver() {
                 @click="form.donations.splice(i, 1)"
               />
             </div>
+
+            <UFormField
+              v-if="isPixRow(row.type)"
+              :label="t.pixOwnerQuestion"
+              required
+              :error="errorFor(`doacoes.${i}.tipo`)"
+            >
+              <URadioGroup
+                :model-value="isPixDonation(row.type) ? row.type : undefined"
+                :items="pixOwnerOptions"
+                orientation="horizontal"
+                @update:model-value="choosePixOwner(row, String($event))"
+              />
+            </UFormField>
 
             <UFormField
               v-if="usesDonationKey(row.type)"
@@ -606,7 +697,7 @@ async function startOver() {
               :label="t.donationSource"
               required
               :error="errorFor(`doacoes.${i}.fonte`)"
-              :help="row.sourceCleared ? t.sourceClearedWarning : undefined"
+              :help="sourceHelp(row)"
             >
               <UInput v-model="row.source" placeholder="https://instagram.com/p/…" class="w-full" />
             </UFormField>
