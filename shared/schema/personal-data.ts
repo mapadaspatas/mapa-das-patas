@@ -81,7 +81,11 @@ export const personalKeyInTextMessage =
   + 'Chave de pessoa não é publicada aqui: informe o link do post onde ela aparece, '
   + 'no campo de doação.'
 
-/** A mesma recusa no campo de chave, onde a saída é trocar o tipo da doação. */
+/**
+ * A mesma recusa no campo de chave. Diz o que acontece com a doação, e não que
+ * controle usar: o mesmo texto sai no formulário, na resposta da Function e na
+ * validação de CI, e quem abre PR direto no YAML não tem tela nenhuma na frente.
+ */
 export const personalKeyInKeyFieldMessage =
   'Chave de pessoa não é publicada aqui: só publicamos chave de CNPJ. '
-  + 'Responda que a chave é de uma pessoa e informe o link do post onde ela aparece.'
+  + 'A doação entra sem a chave, apontando para o link do post onde ela aparece.'
