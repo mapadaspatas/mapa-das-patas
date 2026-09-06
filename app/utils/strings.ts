@@ -153,7 +153,7 @@ export const strings = {
   },
   list: {
     description: 'Encontre iniciativas por região, tipo de trabalho e como você pode ajudar.',
-    searchPlaceholder: 'Buscar por nome ou cidade…',
+    searchPlaceholder: 'Buscar por nome, cidade ou perfil…',
     stateFilter: 'Estado',
     cityFilter: 'Cidade',
     typeFilter: 'Tipo',

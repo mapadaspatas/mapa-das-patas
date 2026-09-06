@@ -7,7 +7,7 @@ useSeoMeta({ title: strings.initiatives.title, description: strings.list.descrip
 
 const { data: initiatives } = await useAsyncData('iniciativas-listagem', () =>
   queryCollection('iniciativas')
-    .select('stem', 'nome', 'estado', 'cidade', 'tipo', 'especies', 'necessidades', 'imagem', 'verificado', 'doacoes')
+    .select('stem', 'nome', 'estado', 'cidade', 'tipo', 'especies', 'necessidades', 'imagem', 'verificado', 'doacoes', 'redes')
     .all(),
 )
 
