@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Donation } from '../../../shared/schema/initiative'
+import type { Donation, Initiative } from '../../../shared/schema/initiative'
 
 /**
  * Botão que monta o Cartão vertical da Iniciativa e oferece salvar ou
@@ -17,6 +17,10 @@ const props = defineProps<{
   image?: string
   /** Endereço absoluto da página, o mesmo que o botão de compartilhar usa. */
   url: string
+  /** A descrição publicada da Iniciativa, como ela a escreveu. */
+  description?: string
+  /** As redes publicadas dela, que no Cartão dizem onde ela responde. */
+  social?: Initiative['redes']
   donations?: Donation[]
 }>()
 
@@ -41,6 +45,15 @@ const brCode = computed(() => initiativeBrCode(props.donations, props.name, prop
 /** O endereço como se lê no Cartão: sem `https://`, que ninguém digita. */
 const address = computed(() => props.url.replace(/^https?:\/\//, ''))
 
+/**
+ * As redes como o Cartão as imprime, na mesma ordem e com o mesmo texto dos
+ * botões da página: quem recebe o story e quem abre a página leem as mesmas
+ * redes, e o Cartão não elege nenhuma delas como a principal.
+ */
+const socialAddresses = computed(() =>
+  props.social ? socialLinks(props.social).map((link) => link.label) : [],
+)
+
 const fileName = computed(() => strings.detail.promoteFileName(props.slug))
 
 /**
@@ -61,6 +74,8 @@ async function draw() {
       estado: props.state,
       endereco: address.value,
       verificado: props.verified,
+      descricao: props.description,
+      redes: socialAddresses.value,
       imagem: props.image,
       brCode: withQrCode.value ? (brCode.value ?? undefined) : undefined,
     })

@@ -27,9 +27,11 @@ import {
   dimensoes,
   ESPACEJAMENTO_DISPLAY,
   escapar,
+  type Estilo,
   FAMILIA,
   type Medir,
   pata,
+  quebrar,
   texto,
 } from './desenho.ts'
 import { logoViewBox } from './logo.ts'
@@ -43,7 +45,7 @@ import { strings } from './strings.ts'
  * velho publicado sem ninguém perceber. Esse gerador ainda não foi escrito, e
  * até ele existir nada aqui lê esta constante.
  */
-export const VERSAO_DO_DESENHO = 1
+export const VERSAO_DO_DESENHO = 2
 
 export const ENQUADRAMENTOS = {
   /**
@@ -69,6 +71,18 @@ export interface DadosDoCartao {
   endereco: string
   /** Selo Verificado: a Iniciativa confirmou os dados por canal oficial. */
   verificado?: boolean
+  /**
+   * A descrição que a Iniciativa publicou, como ela a escreveu. Entra só no
+   * vertical, e o desenho apara o que não couber.
+   */
+  descricao?: string
+  /**
+   * As redes da Iniciativa, cada uma já como se lê e se digita (`@perfil`,
+   * `linktr.ee/perfil`). Vêm prontas de quem chama pela mesma razão do
+   * endereço: o desenho imprime texto e não decide o que uma rede é. Entram só
+   * no vertical.
+   */
+  redes?: string[]
   /**
    * A Imagem que a própria Iniciativa enviou, já embutida como data URI. Tem
    * que vir embutida, e não como caminho: um `href` externo faria o navegador
@@ -104,6 +118,10 @@ const PROPORCAO = {
   /** Teto do corpo do nome; o corpo real sai de `ajustar()`. */
   nome: 0.088,
   lugar: 0.032,
+  descricao: 0.030,
+  redes: 0.030,
+  /** Rótulo que abre as redes, um degrau abaixo delas. */
+  rotulo: 0.022,
   endereco: 0.031,
   selo: 0.026,
   qr: 0.30,
@@ -122,6 +140,10 @@ const VAO = {
   aposCabecalho: 0.05,
   aposFoto: 0.045,
   aposNome: 0.024,
+  aposLugar: 0.032,
+  aposDescricao: 0.030,
+  /** Entre o rótulo e a linha de redes, que são a mesma peça. */
+  aposRotulo: 0.010,
   antesRodape: 0.045,
   /** Entre a foto e a coluna de texto, no enquadramento deitado. */
   aoLadoDaFoto: 0.04,
@@ -138,6 +160,17 @@ const LINHAS_DO_NOME = 3
 
 /** Largura de um espaço, em fração do corpo, para separar trechos vizinhos. */
 const ESPACO = 0.28
+
+const ENTRELINHA_DESCRICAO = 1.35
+
+/**
+ * Teto de linhas da descrição. Quatro dão conta da descrição típica do
+ * diretório inteira; as poucas mais longas que isso saem aparadas.
+ */
+const LINHAS_DA_DESCRICAO = 4
+
+/** Entre uma rede e a seguinte, na mesma linha. */
+const SEPARADOR = ' · '
 
 const LOGO = dimensoes(logoViewBox)
 
@@ -297,6 +330,120 @@ function qrCode(fragmento: string, x: number, y: number, lado: number) {
     + ` width="${arredondar(lado - respiro * 2)}" height="${arredondar(lado - respiro * 2)}">${fragmento}</svg>`
 }
 
+/**
+ * As linhas de um texto corrido, no máximo `maximo`, com o corte marcado por
+ * reticência.
+ *
+ * A descrição é escrita pela Iniciativa e o schema não limita o tamanho dela: a
+ * mais longa do diretório tem meia página. Aqui não serve o `ajustar()` do
+ * nome, que encolhe o corpo até caber e falha quando não dá — meia página de
+ * texto cabe, sim, num corpo que ninguém lê. Cortar é o que mantém o resto do
+ * Cartão legível, e o endereço logo abaixo leva quem quiser a descrição
+ * inteira, na página, onde ela está atualizada.
+ */
+function aparar(medir: Medir, conteudo: string, estilo: Estilo, largura: number, maximo: number) {
+  const linhas = quebrar(medir, conteudo, largura, estilo)
+  if (linhas.length <= maximo) return linhas
+
+  const cortadas = linhas.slice(0, maximo)
+  const palavras = cortadas[maximo - 1]!.split(' ')
+  // A reticência ocupa espaço: sai palavra até ela caber junto na linha.
+  while (palavras.length > 1 && medir(`${palavras.join(' ')}…`, estilo).largura > largura) {
+    palavras.pop()
+  }
+  cortadas[maximo - 1] = `${palavras.join(' ')}…`
+  return cortadas
+}
+
+/**
+ * As redes numa linha só. Quando não cabem todas, as últimas ficam de fora em
+ * vez de o corpo encolher: a linha é endereço para ler e digitar de dentro de
+ * uma imagem, e endereço pequeno demais para ler não serve para nada. A ordem
+ * é a da página, então o que fica de fora é sempre o fim da lista.
+ */
+function emUmaLinha(medir: Medir, redes: string[], estilo: Estilo, largura: number) {
+  const cabem = [...redes]
+  while (cabem.length > 1 && medir(cabem.join(SEPARADOR), estilo).largura > largura) cabem.pop()
+  return cabem.join(SEPARADOR)
+}
+
+/**
+ * O que vem abaixo do lugar: a descrição publicada e as redes da Iniciativa.
+ *
+ * As duas só entram em pé. Deitado, os 630px de altura já são disputados pelo
+ * nome e pela foto, e um parágrafo ali sairia no corpo em que ninguém lê — o
+ * enquadramento decide, como no QR, para nenhum chamador conseguir pedir o
+ * contrário.
+ *
+ * As redes saem todas no mesmo peso, na ordem em que a página as mostra: qual
+ * delas é o canal principal é escolha da Iniciativa, não nossa, e o Cartão não
+ * tem como saber onde ela responde hoje. O endereço, logo abaixo, leva a todas
+ * elas com link.
+ */
+function cauda(
+  medir: Medir,
+  dados: DadosDoCartao,
+  largura: number,
+  x: number,
+  util: number,
+  emPe: boolean,
+) {
+  const pedacos: { vao: number, altura: number, desenhar: (topo: number) => string }[] = []
+  const descricao = emPe ? dados.descricao?.trim() : undefined
+  const redes = emPe ? (dados.redes ?? []).filter((rede) => rede.trim()) : []
+
+  if (descricao) {
+    const estilo = { familia: FAMILIA.texto, peso: 400, tamanho: fracao(largura, PROPORCAO.descricao) }
+    const linhas = aparar(medir, descricao, estilo, util, LINHAS_DA_DESCRICAO)
+    pedacos.push({
+      vao: fracao(largura, VAO.aposLugar),
+      altura: alturaDoBloco(medir, linhas, estilo, ENTRELINHA_DESCRICAO),
+      desenhar: (topo) => bloco(
+        medir,
+        linhas.map((conteudo) => [{ conteudo, cor: COR.tintaFraca }]),
+        x,
+        topo,
+        estilo,
+        ENTRELINHA_DESCRICAO,
+      ).svg,
+    })
+  }
+
+  if (redes.length) {
+    const estiloRotulo = { familia: FAMILIA.texto, peso: 600, tamanho: fracao(largura, PROPORCAO.rotulo) }
+    const estilo = { familia: FAMILIA.texto, peso: 600, tamanho: fracao(largura, PROPORCAO.redes) }
+    const linha = emUmaLinha(medir, redes, estilo, util)
+    const caixaRotulo = medir(strings.shareCard.social, estiloRotulo)
+    const caixaLinha = medir(linha, estilo)
+    const entre = fracao(largura, VAO.aposRotulo)
+    const alturaRotulo = caixaRotulo.base - caixaRotulo.topo
+
+    pedacos.push({
+      vao: fracao(largura, pedacos.length ? VAO.aposDescricao : VAO.aposLugar),
+      altura: alturaRotulo + entre + caixaLinha.base - caixaLinha.topo,
+      desenhar: (topo) =>
+        texto([{ conteudo: strings.shareCard.social, cor: COR.tintaFraca }], x, topo - caixaRotulo.topo, estiloRotulo)
+        + '\n  '
+        + texto([{ conteudo: linha, cor: COR.tinta }], x, topo + alturaRotulo + entre - caixaLinha.topo, estilo),
+    })
+  }
+
+  return {
+    altura: pedacos.reduce((soma, pedaco) => soma + pedaco.vao + pedaco.altura, 0),
+    desenhar: (topo: number) => {
+      let y = topo
+      return pedacos
+        .map((pedaco) => {
+          y += pedaco.vao
+          const svg = pedaco.desenhar(y)
+          y += pedaco.altura
+          return svg
+        })
+        .join('\n  ')
+    },
+  }
+}
+
 /** O vão entre a assinatura e o rodapé, que é onde a identidade é arrumada. */
 interface Vao {
   largura: number
@@ -329,11 +476,12 @@ function ajustarNome(medir: Medir, dados: DadosDoCartao, largura: number, altura
   })
 }
 
-/** Altura do nome mais o vão e o lugar que vêm abaixo dele. */
-function alturaDaColuna(medir: Medir, nome: Arrumacao['nome'], largura: number) {
+/** Altura do nome, do lugar e do que mais vier abaixo deles. */
+function alturaDaColuna(medir: Medir, nome: Arrumacao['nome'], largura: number, abaixo: number) {
   return alturaDoBloco(medir, nome.linhas, nome.estilo, ENTRELINHA_NOME)
     + fracao(largura, VAO.aposNome)
     + fracao(largura, PROPORCAO.lugar) * 1.5
+    + abaixo
 }
 
 /**
@@ -364,7 +512,7 @@ function deitar(medir: Medir, dados: DadosDoCartao, vao: Vao): Arrumacao {
     vao.fim - vao.topo - fracao(largura, VAO.aposNome) - fracao(largura, PROPORCAO.lugar) * 1.5,
     util - lado - aoLado,
   )
-  const alturaColuna = alturaDaColuna(medir, nome, largura)
+  const alturaColuna = alturaDaColuna(medir, nome, largura, 0)
 
   // Foto e coluna são vizinhas: cada uma se centra na altura da outra.
   const pilhaTopo = centrar(vao, Math.max(lado, alturaColuna))
@@ -384,7 +532,7 @@ function deitar(medir: Medir, dados: DadosDoCartao, vao: Vao): Arrumacao {
  * avatar de iniciais para bem antes disso — ampliar duas letras até a largura
  * da página não diz nada a mais sobre a Iniciativa.
  */
-function empilhar(medir: Medir, dados: DadosDoCartao, vao: Vao): Arrumacao {
+function empilhar(medir: Medir, dados: DadosDoCartao, vao: Vao, abaixo: number): Arrumacao {
   const { largura, margem, util } = vao
   const aposFoto = fracao(largura, VAO.aposFoto)
   const minima = fracao(largura, PROPORCAO.fotoMinima)
@@ -395,10 +543,10 @@ function empilhar(medir: Medir, dados: DadosDoCartao, vao: Vao): Arrumacao {
     dados,
     largura,
     vao.fim - vao.topo - fracao(largura, VAO.aposNome)
-    - fracao(largura, PROPORCAO.lugar) * 1.5 - minima - aposFoto,
+    - fracao(largura, PROPORCAO.lugar) * 1.5 - minima - aposFoto - abaixo,
     util,
   )
-  const alturaColuna = alturaDaColuna(medir, nome, largura)
+  const alturaColuna = alturaDaColuna(medir, nome, largura, abaixo)
 
   const teto = fracao(largura, dados.imagem ? PROPORCAO.fotoEmPe : PROPORCAO.avatarEmPe)
   const lado = Math.max(minima, Math.min(teto, vao.fim - vao.topo - alturaColuna - aposFoto))
@@ -457,7 +605,15 @@ export function desenharCartao(
     topo: marca.fim + fracao(largura, VAO.aposCabecalho),
     fim: rodapeTopo - fracao(largura, VAO.antesRodape),
   }
-  const arrumacao = emPe ? empilhar(medir, dados, vao) : deitar(medir, dados, vao)
+  /*
+   * A descrição e as redes são medidas antes de a pilha ser arrumada: elas
+   * disputam a mesma altura que a foto e o nome, e é a sobra delas que os dois
+   * dividem.
+   */
+  const abaixo = cauda(medir, dados, largura, margem, util, emPe)
+  const arrumacao = emPe
+    ? empilhar(medir, dados, vao, abaixo.altura)
+    : deitar(medir, dados, vao)
 
   const blocoNome = bloco(
     medir,
@@ -475,15 +631,18 @@ export function desenharCartao(
     largura,
   )
 
+  const svgAbaixo = abaixo.desenhar(blocoLugar.fim)
+  const fimDaColuna = blocoLugar.fim + abaixo.altura
+
   /*
    * O desenho está amarrado a dados que a moderação aprova, não a constantes
    * daqui: um nome longo demais empurraria o lugar por cima do rodapé e o
    * Cartão sairia ilegível sem ninguém ver. Falhar é mais barato que publicar.
    */
-  if (blocoLugar.fim > rodapeTopo) {
+  if (fimDaColuna > rodapeTopo) {
     throw new Error(
       `"${dados.nome}" não cabe no enquadramento ${enquadramento}: `
-      + `o bloco passa ${Math.round(blocoLugar.fim - rodapeTopo)}px do rodapé`,
+      + `o bloco passa ${Math.round(fimDaColuna - rodapeTopo)}px do rodapé`,
     )
   }
 
@@ -494,6 +653,7 @@ export function desenharCartao(
   ${foto(medir, dados, margem, arrumacao.fotoY, arrumacao.lado)}
   ${blocoNome.svg}
   ${blocoLugar.svg}
+  ${svgAbaixo}
   ${rodape}
 </svg>
 `

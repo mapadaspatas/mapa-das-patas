@@ -54,6 +54,9 @@ export const strings = {
   card: {
     source: 'fonte',
   },
+  shareCard: {
+    social: 'Redes',
+  },
   register: {
     title: 'Cadastrar iniciativa',
     subtitle:
@@ -197,15 +200,10 @@ export const strings = {
     share: 'Compartilhar',
     shareText: (name: string) => `${name} precisa de ajuda. Veja como doar com segurança:`,
     shareLinkCopied: 'Link copiado!',
-    /*
-     * "Cartão" é como o projeto chama esta peça, mas fica fora do texto da
-     * tela: numa página cheia de PIX e chave de doação, "cartão" seria lido
-     * como cartão de crédito. Aqui ele é dito pelo que faz.
-     */
     promote: 'Divulgar',
     promoteTitle: 'Divulgar nos stories',
     promoteDescription:
-      'Um story pronto com o nome, a cidade e o endereço desta página, montado aqui no seu navegador. O endereço vai junto para quem receber conferir a chave e a fonte na origem, sempre atualizadas, em vez de confiar num print.',
+      'Um story pronto com o nome, a cidade, a descrição e as redes desta iniciativa, montado aqui no seu navegador. O endereço da página vai junto para quem receber conferir a chave e a fonte na origem, sempre atualizadas, em vez de confiar num print.',
     promoteWithQr: 'Incluir o QR Code do PIX',
     promoteWithQrHelp: 'O mesmo código que aparece na página, montado a partir da chave publicada aqui.',
     promoteGenerating: 'Montando…',

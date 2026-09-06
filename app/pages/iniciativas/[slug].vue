@@ -120,6 +120,8 @@ async function share() {
           :verified="Boolean(verification)"
           :image="initiative.imagem ?? undefined"
           :url="pageUrl"
+          :description="initiative.descricao"
+          :social="initiative.redes ?? undefined"
           :donations="initiative.doacoes ?? undefined"
         />
       </div>

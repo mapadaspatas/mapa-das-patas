@@ -101,24 +101,48 @@ export interface SocialLink {
   name: string
   icon: string
   url: string
+  /**
+   * O endereço como se lê e se digita, para a peça que imprime texto no lugar
+   * de um link clicável: o `@perfil` do Instagram, o `linktr.ee/perfil` dos
+   * outros. É o que o Cartão leva.
+   */
+  label: string
 }
 
 /** Converte o objeto `redes` da Iniciativa em links prontos para renderizar. */
 export function socialLinks(social: NonNullable<Initiative['redes']>): SocialLink[] {
   const links: SocialLink[] = []
-  if (social.instagram)
-    links.push({ name: 'Instagram', icon: 'i-simple-icons-instagram', url: `https://instagram.com/${social.instagram}` })
-  if (social.facebook) links.push({ name: 'Facebook', icon: 'i-simple-icons-facebook', url: social.facebook })
-  if (social.tiktok) links.push({ name: 'TikTok', icon: 'i-simple-icons-tiktok', url: social.tiktok })
-  if (social.youtube) links.push({ name: 'YouTube', icon: 'i-simple-icons-youtube', url: social.youtube })
-  if (social.x) links.push({ name: 'X', icon: 'i-simple-icons-x', url: social.x })
+  if (social.instagram) {
+    links.push({
+      name: 'Instagram',
+      icon: 'i-simple-icons-instagram',
+      url: `https://instagram.com/${social.instagram}`,
+      label: `@${social.instagram}`,
+    })
+  }
+  if (social.facebook)
+    links.push({ name: 'Facebook', icon: 'i-simple-icons-facebook', url: social.facebook, label: sourceLabel(social.facebook) })
+  if (social.tiktok)
+    links.push({ name: 'TikTok', icon: 'i-simple-icons-tiktok', url: social.tiktok, label: sourceLabel(social.tiktok) })
+  if (social.youtube)
+    links.push({ name: 'YouTube', icon: 'i-simple-icons-youtube', url: social.youtube, label: sourceLabel(social.youtube) })
+  if (social.x) links.push({ name: 'X', icon: 'i-simple-icons-x', url: social.x, label: sourceLabel(social.x) })
+  /*
+   * O WhatsApp é o único que não diz o próprio endereço: ele é telefone de
+   * pessoa, e o site não republica nenhum. Na tela o número é o destino de um
+   * botão, que ninguém lê nem copia dali; impresso numa imagem que circula em
+   * story e em grupo, ele vira dado publicado por nós. Quem quiser falar por
+   * lá chega pela página, cujo endereço a peça leva de qualquer jeito.
+   */
   if (social.whatsapp)
     links.push({
       name: 'WhatsApp',
       icon: 'i-simple-icons-whatsapp',
       url: social.whatsapp.startsWith('+') ? `https://wa.me/${social.whatsapp.replace(/\D/g, '')}` : social.whatsapp,
+      label: 'WhatsApp',
     })
-  if (social.site) links.push({ name: 'Site', icon: 'i-lucide-globe', url: social.site })
-  if (social.linktree) links.push({ name: 'Links', icon: 'i-lucide-link', url: social.linktree })
+  if (social.site) links.push({ name: 'Site', icon: 'i-lucide-globe', url: social.site, label: sourceLabel(social.site) })
+  if (social.linktree)
+    links.push({ name: 'Links', icon: 'i-lucide-link', url: social.linktree, label: sourceLabel(social.linktree) })
   return links
 }
