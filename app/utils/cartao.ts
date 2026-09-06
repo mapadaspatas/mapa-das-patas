@@ -72,6 +72,12 @@ export interface DadosDoCartao {
   /** Selo Verificado: a Iniciativa confirmou os dados por canal oficial. */
   verificado?: boolean
   /**
+   * O Tipo dito por extenso, com as Espécies quando houver: "Abrigo/Santuário
+   * para cães e gatos". Vem montado de quem chama, que é quem tem os rótulos
+   * do vocabulário. Entra só no vertical.
+   */
+  tipo?: string
+  /**
    * A descrição que a Iniciativa publicou, como ela a escreveu. Entra só no
    * vertical, e o desenho apara o que não couber.
    */
@@ -83,6 +89,12 @@ export interface DadosDoCartao {
    * no vertical.
    */
   redes?: string[]
+  /**
+   * O que a Iniciativa está precisando agora, cada uma pelo rótulo do
+   * vocabulário ("Ração", "Lar temporário"). É o que faz o Cartão pedir algo
+   * além de dinheiro. Entra só no vertical.
+   */
+  necessidades?: string[]
   /**
    * A Imagem que a própria Iniciativa enviou, já embutida como data URI. Tem
    * que vir embutida, e não como caminho: um `href` externo faria o navegador
@@ -141,7 +153,8 @@ const VAO = {
   aposFoto: 0.045,
   aposNome: 0.024,
   aposLugar: 0.032,
-  aposDescricao: 0.030,
+  /** Entre um bloco da cauda e o seguinte. */
+  entreBlocos: 0.030,
   /** Entre o rótulo e a linha de redes, que são a mesma peça. */
   aposRotulo: 0.010,
   antesRodape: 0.045,
@@ -162,6 +175,12 @@ const LINHAS_DO_NOME = 3
 const ESPACO = 0.28
 
 const ENTRELINHA_DESCRICAO = 1.35
+
+/**
+ * Teto de linhas do Tipo com as Espécies. Duas dão conta do caso mais longo do
+ * vocabulário, um Tipo por extenso seguido das cinco Espécies.
+ */
+const LINHAS_DO_TIPO = 2
 
 /**
  * Teto de linhas da descrição. Quatro dão conta da descrição típica do
@@ -368,17 +387,18 @@ function emUmaLinha(medir: Medir, redes: string[], estilo: Estilo, largura: numb
 }
 
 /**
- * O que vem abaixo do lugar: a descrição publicada e as redes da Iniciativa.
+ * O que vem abaixo do lugar: o que a Iniciativa é, o que ela escreveu sobre
+ * si, o que está precisando e onde ela responde.
  *
- * As duas só entram em pé. Deitado, os 630px de altura já são disputados pelo
+ * Tudo isso só entra em pé. Deitado, os 630px de altura já são disputados pelo
  * nome e pela foto, e um parágrafo ali sairia no corpo em que ninguém lê — o
  * enquadramento decide, como no QR, para nenhum chamador conseguir pedir o
  * contrário.
  *
- * As redes saem todas no mesmo peso, na ordem em que a página as mostra: qual
- * delas é o canal principal é escolha da Iniciativa, não nossa, e o Cartão não
- * tem como saber onde ela responde hoje. O endereço, logo abaixo, leva a todas
- * elas com link.
+ * A ordem é a da página, de cima para baixo, e é a foto que paga a conta: ela
+ * fica com a altura que sobrar, até o piso em que deixaria de ser legível. Uma
+ * Iniciativa que preencheu tudo aparece com a foto menor e dizendo mais, que é
+ * o que um story precisa fazer.
  */
 function cauda(
   medir: Medir,
@@ -389,14 +409,15 @@ function cauda(
   emPe: boolean,
 ) {
   const pedacos: { vao: number, altura: number, desenhar: (topo: number) => string }[] = []
-  const descricao = emPe ? dados.descricao?.trim() : undefined
-  const redes = emPe ? (dados.redes ?? []).filter((rede) => rede.trim()) : []
+  // O primeiro se descola do lugar; os seguintes, do bloco anterior.
+  const vao = () => fracao(largura, pedacos.length ? VAO.entreBlocos : VAO.aposLugar)
 
-  if (descricao) {
+  /** Texto corrido: o que a Iniciativa é, e o que ela escreveu sobre si. */
+  function paragrafo(conteudo: string, maximo: number) {
     const estilo = { familia: FAMILIA.texto, peso: 400, tamanho: fracao(largura, PROPORCAO.descricao) }
-    const linhas = aparar(medir, descricao, estilo, util, LINHAS_DA_DESCRICAO)
+    const linhas = aparar(medir, conteudo, estilo, util, maximo)
     pedacos.push({
-      vao: fracao(largura, VAO.aposLugar),
+      vao: vao(),
       altura: alturaDoBloco(medir, linhas, estilo, ENTRELINHA_DESCRICAO),
       desenhar: (topo) => bloco(
         medir,
@@ -409,24 +430,40 @@ function cauda(
     })
   }
 
-  if (redes.length) {
+  /**
+   * Lista curta sob um rótulo: as necessidades, as redes. O rótulo é preciso
+   * porque os itens sozinhos não se explicam — "Ração · Castração" pode ser o
+   * que a Iniciativa faz ou o que ela está pedindo.
+   */
+  function lista(rotulo: string, itens: string[]) {
     const estiloRotulo = { familia: FAMILIA.texto, peso: 600, tamanho: fracao(largura, PROPORCAO.rotulo) }
     const estilo = { familia: FAMILIA.texto, peso: 600, tamanho: fracao(largura, PROPORCAO.redes) }
-    const linha = emUmaLinha(medir, redes, estilo, util)
-    const caixaRotulo = medir(strings.shareCard.social, estiloRotulo)
+    const linha = emUmaLinha(medir, itens, estilo, util)
+    const caixaRotulo = medir(rotulo, estiloRotulo)
     const caixaLinha = medir(linha, estilo)
     const entre = fracao(largura, VAO.aposRotulo)
     const alturaRotulo = caixaRotulo.base - caixaRotulo.topo
 
     pedacos.push({
-      vao: fracao(largura, pedacos.length ? VAO.aposDescricao : VAO.aposLugar),
+      vao: vao(),
       altura: alturaRotulo + entre + caixaLinha.base - caixaLinha.topo,
       desenhar: (topo) =>
-        texto([{ conteudo: strings.shareCard.social, cor: COR.tintaFraca }], x, topo - caixaRotulo.topo, estiloRotulo)
+        texto([{ conteudo: rotulo, cor: COR.tintaFraca }], x, topo - caixaRotulo.topo, estiloRotulo)
         + '\n  '
         + texto([{ conteudo: linha, cor: COR.tinta }], x, topo + alturaRotulo + entre - caixaLinha.topo, estilo),
     })
   }
+
+  const limpar = (itens?: string[]) => (emPe ? itens ?? [] : []).filter((item) => item.trim())
+  const tipo = emPe ? dados.tipo?.trim() : undefined
+  const descricao = emPe ? dados.descricao?.trim() : undefined
+  const necessidades = limpar(dados.necessidades)
+  const redes = limpar(dados.redes)
+
+  if (tipo) paragrafo(tipo, LINHAS_DO_TIPO)
+  if (descricao) paragrafo(descricao, LINHAS_DA_DESCRICAO)
+  if (necessidades.length) lista(strings.shareCard.needs, necessidades)
+  if (redes.length) lista(strings.shareCard.social, redes)
 
   return {
     altura: pedacos.reduce((soma, pedaco) => soma + pedaco.vao + pedaco.altura, 0),

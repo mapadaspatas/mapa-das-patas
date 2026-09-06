@@ -211,23 +211,39 @@ describe('desenho que não cabe', () => {
  * para postar. O card de link é a prévia de um endereço numa conversa: ali o
  * que precisa aparecer é de quem é a página.
  */
-describe('descrição e redes', () => {
+describe('a ficha da Iniciativa', () => {
   const completa: DadosDoCartao = {
     ...base,
+    tipo: 'Abrigo/Santuário para cães e gatos',
     descricao: 'O abrigo cuida de 120 cães e é mantido por meio de doações.',
+    necessidades: ['Ração', 'Castração'],
     redes: ['@patasdobem', 'patasdobem.com.br'],
   }
 
-  it('entram no vertical de stories', () => {
+  it('entra inteira no vertical de stories', () => {
     const impresso = textoImpresso(desenharCartao(completa, 'stories', medirComResvg))
+    expect(impresso).toContain('Abrigo/Santuário para cães e gatos')
     expect(impresso).toContain('O abrigo cuida de 120 cães')
+    expect(impresso).toContain('Ração · Castração')
     expect(impresso).toContain('@patasdobem')
     expect(impresso).toContain('patasdobem.com.br')
   })
 
-  it('ficam de fora do card de link, por mais que quem chama peça', () => {
+  /*
+   * Os rótulos são o que separa uma lista da outra: "Ração · Castração"
+   * sozinho tanto pode ser o que a Iniciativa faz quanto o que ela pede.
+   */
+  it('diz o que cada lista é', () => {
+    const impresso = textoImpresso(desenharCartao(completa, 'stories', medirComResvg))
+    expect(impresso).toContain('Precisando agora')
+    expect(impresso).toContain('Redes')
+  })
+
+  it('fica de fora do card de link, por mais que quem chama peça', () => {
     const impresso = textoImpresso(desenharCartao(completa, 'link', medirComResvg))
+    expect(impresso).not.toContain('Abrigo/Santuário')
     expect(impresso).not.toContain('O abrigo cuida')
+    expect(impresso).not.toContain('Ração')
     expect(impresso).not.toContain('@patasdobem')
   })
 
@@ -277,24 +293,44 @@ describe('descrição e redes', () => {
   })
 
   /*
-   * O pior caso real de pé, com tudo junto: o nome mais longo do diretório em
-   * três linhas, o Selo, a descrição, as redes e o QR disputando a mesma
+   * Tudo junto e no pior tamanho de cada coisa: o nome mais longo do diretório
+   * em três linhas, o Selo, o Tipo com as cinco Espécies, a descrição mais
+   * longa, as cinco necessidades, uma rede e o QR, todos disputando a mesma
    * altura. É a combinação que faz `desenharCartao` falhar se algum vão sair
-   * do lugar.
+   * do lugar, e é a que diz quanto sobra para a foto.
    */
-  it('acomoda o nome mais longo com descrição, redes, Selo e QR', () => {
-    const pior: DadosDoCartao = {
-      ...maisLongo,
-      verificado: true,
-      descricao: 'Iniciativa de proteção animal em São Gonçalo do Amarante (CE). Informações '
-        + 'reunidas pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.',
-      redes: ['@malu.recantodosanimais'],
-      qr: '<rect width="10" height="10"/>',
-    }
+  const pior: DadosDoCartao = {
+    ...maisLongo,
+    verificado: true,
+    imagem: 'data:image/webp;base64,UklGRg==',
+    tipo: 'Protetor independente para cães, gatos, cavalos, silvestres e outros animais',
+    descricao: 'Em 2020 ao sonho virou realidade: a RonronAmar nasceu do sonho de resgatar '
+      + 'gatos em situação de risco e aumentar o número de lares cheios de amor com nossos '
+      + 'ronrons. Temos uma casa que servirá como abrigo para transformar a vida de animais '
+      + 'que sofreram abandono e maus trastos.',
+    necessidades: ['Ração', 'Lar temporário', 'Voluntários', 'Castração', 'Medicamentos'],
+    redes: ['@malu.recantodosanimais'],
+    qr: '<rect width="10" height="10"/>',
+  }
+
+  it('acomoda a ficha inteira com o nome mais longo, o Selo e o QR', () => {
     const impresso = textoImpresso(desenharCartao(pior, 'stories', medirComResvg))
     expect(impresso).toContain('Verificada')
+    expect(impresso).toContain('Protetor independente para cães')
+    expect(impresso).toContain('Ração · Lar temporário')
     expect(impresso).toContain('@malu.recantodosanimais')
     expect(impresso).toContain(pior.endereco)
+  })
+
+  /*
+   * A foto é o que cede a altura para o texto, mas ela tem um piso: abaixo de
+   * um quinto da largura vira enfeite e some da leitura. Com a ficha cheia ela
+   * chega perto disso, e é aqui que se descobre se passou.
+   */
+  it('encolhe a foto sem deixá-la abaixo do piso', () => {
+    const svg = desenharCartao(pior, 'stories', medirComResvg)
+    const lado = Number(svg.match(/<image[^>]*width="([0-9.]+)"/)![1])
+    expect(lado).toBeGreaterThanOrEqual(ENQUADRAMENTOS.stories.largura / 5)
   })
 })
 

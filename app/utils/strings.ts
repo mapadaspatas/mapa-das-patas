@@ -55,6 +55,7 @@ export const strings = {
     source: 'fonte',
   },
   shareCard: {
+    needs: 'Precisando agora',
     social: 'Redes',
   },
   register: {
@@ -203,7 +204,7 @@ export const strings = {
     promote: 'Divulgar',
     promoteTitle: 'Divulgar nos stories',
     promoteDescription:
-      'Um story pronto com o nome, a cidade, a descrição e as redes desta iniciativa, montado aqui no seu navegador. O endereço da página vai junto para quem receber conferir a chave e a fonte na origem, sempre atualizadas, em vez de confiar num print.',
+      'Um story pronto com o que esta página diz da iniciativa: nome, cidade, descrição, o que ela está precisando agora e as redes dela. É montado aqui no seu navegador, e o endereço da página vai junto para quem receber conferir a chave e a fonte na origem, sempre atualizadas, em vez de confiar num print.',
     promoteWithQr: 'Incluir o QR Code do PIX',
     promoteWithQrHelp: 'O mesmo código que aparece na página, montado a partir da chave publicada aqui.',
     promoteGenerating: 'Montando…',

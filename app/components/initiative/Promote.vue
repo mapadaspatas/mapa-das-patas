@@ -19,6 +19,11 @@ const props = defineProps<{
   url: string
   /** A descrição publicada da Iniciativa, como ela a escreveu. */
   description?: string
+  /** Tipo e Espécies, que no Cartão viram a mesma frase do verbete. */
+  type?: Initiative['tipo']
+  species?: Initiative['especies']
+  /** O que ela está precisando agora, para o Cartão pedir além de dinheiro. */
+  needs?: Initiative['necessidades']
   /** As redes publicadas dela, que no Cartão dizem onde ela responde. */
   social?: Initiative['redes']
   donations?: Donation[]
@@ -44,6 +49,12 @@ const brCode = computed(() => initiativeBrCode(props.donations, props.name, prop
 
 /** O endereço como se lê no Cartão: sem `https://`, que ninguém digita. */
 const address = computed(() => props.url.replace(/^https?:\/\//, ''))
+
+/** O Tipo com as Espécies, dito como a página diz. */
+const kind = computed(() => (props.type ? kindSentence(props.type, props.species) : undefined))
+
+/** As necessidades pelos rótulos do vocabulário, na ordem em que vieram. */
+const needList = computed(() => (props.needs ?? []).map((need) => needLabels[need]))
 
 /**
  * As redes como o Cartão as imprime, na mesma ordem e com o mesmo texto dos
@@ -74,7 +85,9 @@ async function draw() {
       estado: props.state,
       endereco: address.value,
       verificado: props.verified,
+      tipo: kind.value,
       descricao: props.description,
+      necessidades: needList.value,
       redes: socialAddresses.value,
       imagem: props.image,
       brCode: withQrCode.value ? (brCode.value ?? undefined) : undefined,

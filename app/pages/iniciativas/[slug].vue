@@ -121,6 +121,9 @@ async function share() {
           :image="initiative.imagem ?? undefined"
           :url="pageUrl"
           :description="initiative.descricao"
+          :type="initiative.tipo"
+          :species="initiative.especies ?? undefined"
+          :needs="initiative.necessidades ?? undefined"
           :social="initiative.redes ?? undefined"
           :donations="initiative.doacoes ?? undefined"
         />
