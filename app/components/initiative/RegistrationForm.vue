@@ -9,6 +9,7 @@ import {
   isPixDonation,
   looksLikePersonalPixKey,
   needs as needValues,
+  personalKeyInTextMessage,
   species as speciesValues,
   states,
   usesDonationKey,
@@ -379,16 +380,20 @@ function errorFor(field: string): string | undefined {
  * neles. Dizemos isso com o texto que a recusa usaria, e sem esperar o blur (ao
  * contrário do campo de chave, onde a máscara de CNPJ passa por estados que
  * parecem telefone): quem corrige antes de enviar nunca vê o envio falhar.
+ *
+ * O texto vem do schema, e não de `strings`: é a mensagem da própria recusa, e
+ * `strings.ts` também roda fora do Nuxt (o `build:social` o importa no Node),
+ * então ele não importa nada de `shared/`.
  */
 function textFieldError(field: string, text: string): string | undefined {
-  if (containsPersonalPixKey(text)) return t.personalKeyInText
+  if (containsPersonalPixKey(text)) return personalKeyInTextMessage
   /*
    * O erro que voltou do envio repete esta mesma regra sobre este mesmo texto,
    * então ele já foi respondido: mantê-lo na tela deixaria a frase vermelha
    * depois de a pessoa corrigir. Os outros erros do campo continuam valendo.
    */
   const error = errorFor(field)
-  return error === t.personalKeyInText ? undefined : error
+  return error === personalKeyInTextMessage ? undefined : error
 }
 
 /**

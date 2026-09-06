@@ -1,5 +1,3 @@
-import { personalKeyInTextMessage } from '../../shared/schema/personal-data'
-
 /**
  * Strings de interface centralizadas (pt-BR).
  * Nenhuma página deve hardcodar texto de UI: tudo vem daqui.
@@ -138,7 +136,6 @@ export const strings = {
     personalKeyWarningTitle: 'Isso parece uma chave pessoal',
     personalKeyWarningText:
       'Só publicamos CNPJ como chave PIX. CPF, e-mail e telefone identificam uma pessoa, e não são republicados aqui. Responda que a chave é de uma pessoa: mostramos ao doador o link oficial onde a chave está.',
-    personalKeyInText: personalKeyInTextMessage,
     usePixAtSource: 'A chave é de uma pessoa',
     publicNoticeTitle: 'O que você enviar fica público',
     publicNoticeText:
