@@ -95,6 +95,11 @@ const countsByState = computed(() => {
   return counts
 })
 
+/** Nome do estado por extenso; UF que não conhecemos volta como veio da URL. */
+function stateName(uf: string) {
+  return ufShapes[uf as keyof typeof ufShapes]?.nome ?? uf
+}
+
 /**
  * Resultados em blocos por estado, dos maiores para os menores. A ordem é a
  * concentração real do diretório (São Paulo tem quase metade), e quem procura
@@ -110,7 +115,7 @@ const groups = computed(() => {
   return [...byState.entries()]
     .map(([uf, items]) => ({
       uf,
-      nome: ufShapes[uf as keyof typeof ufShapes]?.nome ?? uf,
+      nome: stateName(uf),
       items: [...items].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')),
     }))
     .sort((a, b) => b.items.length - a.items.length || a.nome.localeCompare(b.nome, 'pt-BR'))
@@ -156,13 +161,27 @@ const speciesOptions = withAll(strings.list.allFeminine, speciesValues
 const needOptions = withAll(strings.list.allFeminine, needValues
   .map((value) => ({ label: needLabels[value], value })))
 
+/**
+ * O nome de cada critério, num lugar só: ele rotula o select e volta a aparecer
+ * no chip do filtro em vigor. Em duas listas paralelas, o primeiro critério
+ * novo sairia de sincronia entre as duas sem nada quebrar.
+ */
+const filterLabels: Record<keyof FilterState, string> = {
+  search: strings.list.searchFilter,
+  state: strings.list.stateFilter,
+  city: strings.list.cityFilter,
+  type: strings.list.typeFilter,
+  species: strings.list.speciesFilter,
+  need: strings.list.needFilter,
+}
+
 /** Um lugar só para desenhar os cinco selects, cada um com rótulo visível. */
 const selects = computed(() => [
-  { key: 'estado', label: strings.list.stateFilter, model: stateSelection, items: stateOptions.value, disabled: false },
-  { key: 'cidade', label: strings.list.cityFilter, model: citySelection, items: cityOptions.value, disabled: !filters.state },
-  { key: 'tipo', label: strings.list.typeFilter, model: typeSelection, items: typeOptions, disabled: false },
-  { key: 'especie', label: strings.list.speciesFilter, model: speciesSelection, items: speciesOptions, disabled: false },
-  { key: 'necessidade', label: strings.list.needFilter, model: needSelection, items: needOptions, disabled: false },
+  { key: 'estado', label: filterLabels.state, model: stateSelection, items: stateOptions.value, disabled: false },
+  { key: 'cidade', label: filterLabels.city, model: citySelection, items: cityOptions.value, disabled: !filters.state },
+  { key: 'tipo', label: filterLabels.type, model: typeSelection, items: typeOptions, disabled: false },
+  { key: 'especie', label: filterLabels.species, model: speciesSelection, items: speciesOptions, disabled: false },
+  { key: 'necessidade', label: filterLabels.need, model: needSelection, items: needOptions, disabled: false },
 ])
 
 const hasFilters = computed(() => Object.values(filters).some(Boolean))
@@ -171,21 +190,19 @@ function clearFilters() {
   for (const field of Object.keys(filters) as (keyof FilterState)[]) filters[field] = ''
 }
 
-/** Nome do estado por extenso; UF que não conhecemos volta como veio da URL. */
-function stateName(uf: string) {
-  return ufShapes[uf as keyof typeof ufShapes]?.nome ?? uf
-}
-
 /**
  * Um chip por filtro em vigor, cada um removível sozinho. Com Estado, Espécie
  * e Tipo aplicados ao mesmo tempo, a única saída era "Limpar filtros", que
  * apaga tudo: quem queria alargar a busca em um critério tinha que recomeçar
- * pelos cinco. O valor aparece com o rótulo que a pessoa leu no controle, e
- * nunca o valor canônico do schema (`abrigo-santuario`, `lar-temporario`), que
- * não é para ser lido.
+ * pelos cinco.
+ *
+ * O valor sai traduzido, nunca como o valor canônico do schema
+ * (`abrigo-santuario`, `lar-temporario`), que não é escrito para ser lido.
+ * Estado sai por extenso, e não pela sigla que o select mostra, para casar com
+ * o controle do mapa, que também diz "Paraná" com o filtro em vigor.
  */
 const activeChips = computed(() => {
-  const labelOf: Record<keyof FilterState, (value: string) => string> = {
+  const valueLabel: Record<keyof FilterState, (value: string) => string> = {
     search: (value) => value,
     state: stateName,
     city: (value) => value,
@@ -193,20 +210,14 @@ const activeChips = computed(() => {
     species: (value) => speciesLabels[value as keyof typeof speciesLabels] ?? value,
     need: (value) => needLabels[value as keyof typeof needLabels] ?? value,
   }
-  const criterionOf: Record<keyof FilterState, string> = {
-    search: strings.list.searchFilter,
-    state: strings.list.stateFilter,
-    city: strings.list.cityFilter,
-    type: strings.list.typeFilter,
-    species: strings.list.speciesFilter,
-    need: strings.list.needFilter,
-  }
-  return (Object.keys(criterionOf) as (keyof FilterState)[])
+  // A ordem dos chips é a de `filterLabels`: busca primeiro, depois os cinco
+  // selects na ordem em que aparecem na coluna de controles.
+  return (Object.keys(filterLabels) as (keyof FilterState)[])
     .filter((field) => filters[field])
     .map((field) => ({
       field,
-      criterion: criterionOf[field],
-      value: labelOf[field](filters[field]),
+      criterion: filterLabels[field],
+      value: valueLabel[field](filters[field]),
     }))
 })
 
@@ -227,7 +238,7 @@ const mapToggleLabel = computed(() => {
   /* Com o mapa recolhido, ele é o único lugar onde o estado escolhido aparece
    * desenhado. O controle repete qual é, para o recolhimento não esconder um
    * filtro em vigor de quem só olha o topo da página. */
-  return strings.map.showMapFiltered(ufShapes[filters.state as keyof typeof ufShapes]?.nome ?? filters.state)
+  return strings.map.showMapFiltered(stateName(filters.state))
 })
 
 /** Clicar de novo no estado já filtrado desliga o filtro. */
