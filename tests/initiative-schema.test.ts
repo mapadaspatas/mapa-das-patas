@@ -263,3 +263,84 @@ describe('Selo Verificado', () => {
     expect(initiativeSchema.safeParse({ ...validInitiative, verificado: 'sim' }).success).toBe(false)
   })
 })
+
+/*
+ * Chave de pessoa em texto livre. Nome e descrição são publicados como vieram,
+ * então a política que barra a chave no campo de chave vale também para o que
+ * se escreve neles (ver docs/adr/0006). O que se testa aqui é o que o
+ * Contribuidor observa: o texto passa ou é recusado, e com qual mensagem.
+ */
+describe('chave de pessoa em nome e descrição', () => {
+  const withDescription = (descricao: string) =>
+    initiativeSchema.safeParse({ ...validInitiative, descricao })
+
+  const withName = (nome: string) => initiativeSchema.safeParse({ ...validInitiative, nome })
+
+  it.each([
+    ['CPF pontuado', 'Ajude o gatil. PIX: 002.980.205-99, obrigado!'],
+    ['CPF cru', 'Ajude o gatil. PIX 00298020599'],
+    ['e-mail', 'Doações pelo PIX doacao@exemplo.org'],
+    ['telefone com DDI', 'PIX +55 11 99477-3463'],
+    ['telefone com DDD entre parênteses', 'Fale conosco no (11) 99477-3463'],
+    ['telefone cru', 'Chame no zap 11994773463'],
+    ['chave aleatória', 'Chave: 123e4567-e89b-12d3-a456-426614174000'],
+  ])('rejeita %s na descrição', (_caso, descricao) => {
+    expect(withDescription(descricao).success).toBe(false)
+  })
+
+  it.each([
+    ['CPF pontuado', 'Gatil Hope 002.980.205-99'],
+    ['e-mail', 'Gatil Hope doacao@exemplo.org'],
+    ['telefone', 'Gatil Hope (11) 99477-3463'],
+    ['chave aleatória', 'Gatil Hope 123e4567-e89b-12d3-a456-426614174000'],
+  ])('rejeita %s no nome', (_caso, nome) => {
+    expect(withName(nome).success).toBe(false)
+  })
+
+  it('aponta o erro no campo em que a chave foi escrita', () => {
+    const naDescricao = withDescription('PIX 002.980.205-99')
+    expect(naDescricao.error?.issues.map((issue) => issue.path.join('.'))).toContain('descricao')
+
+    const noNome = withName('Gatil Hope 002.980.205-99')
+    expect(noNome.error?.issues.map((issue) => issue.path.join('.'))).toContain('nome')
+  })
+
+  it('explica em linguagem simples onde a informação deve ir', () => {
+    const result = withDescription('PIX 002.980.205-99')
+    expect(result.error?.issues[0]?.message).toBe(
+      'Encontramos o que parece ser um CPF, e-mail, telefone ou chave PIX. '
+      + 'Chave de pessoa não é publicada aqui: informe o link do post onde ela aparece, '
+      + 'no campo de doação.',
+    )
+  })
+
+  /*
+   * CNPJ é dado público da pessoa jurídica e continua passando. O cru é o caso
+   * que obriga a fronteira de dígito nas duas pontas do padrão numérico: os 14
+   * dígitos dele contêm sequências de 10 a 13 dígitos, que sem a fronteira
+   * seriam lidas como telefone.
+   */
+  it.each([
+    ['CNPJ pontuado', 'Somos ONG registrada, CNPJ 31.696.864/0001-13, nota fiscal na hora.'],
+    ['CNPJ cru', 'Somos ONG registrada, CNPJ 31696864000113, nota fiscal na hora.'],
+    ['CNPJ alfanumérico', 'Somos ONG registrada, CNPJ 12.ABC.345/01DE-35.'],
+  ])('aceita %s na descrição', (_caso, descricao) => {
+    expect(withDescription(descricao).success).toBe(true)
+  })
+
+  it.each([
+    ['quantidade', 'Cuidamos de 150 gatos e 40 cães resgatados da rua.'],
+    ['ano de fundação', 'Atuamos desde 2019 no resgate de animais abandonados.'],
+    ['valor em reais', 'Gastamos R$ 1.200,00 por mês só de ração.'],
+    ['CEP', 'Recebemos doações na Rua das Flores, CEP 01310-100.'],
+    [
+      'descrição longa e legítima',
+      'Somos um grupo de protetoras que resgata, castra e cuida de cães e gatos '
+      + 'abandonados desde 2019. Hoje mantemos 150 animais em lares temporários, '
+      + 'com 40 castrações por mês e gasto mensal de R$ 1.200,00 em ração e remédios. '
+      + 'Também fazemos feiras de adoção aos sábados na praça central.',
+    ],
+  ])('aceita %s na descrição', (_caso, descricao) => {
+    expect(withDescription(descricao).success).toBe(true)
+  })
+})

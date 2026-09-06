@@ -68,7 +68,7 @@ for (const file of files) {
 
 if (invalid > 0) {
   console.error(`\n${invalid} de ${files.length} arquivo(s) de Iniciativa inválido(s).`)
-  console.error('Regras em CONTEXT.md: Fonte obrigatória em toda Chave de Doação e regras de dados pessoais.')
+  console.error('Regras em CONTRIBUTING.md: Fonte obrigatória em toda Chave de Doação e regras de dados pessoais.')
   process.exit(1)
 }
 

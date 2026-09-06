@@ -95,10 +95,35 @@ describe('processRegistration', () => {
 
       expect(result.ok).toBe(false)
       if (result.ok) return
-      expect(result.errors.some((e) => e.message.includes('pessoa física'))).toBe(true)
+      expect(result.errors.some((e) => e.message.includes('não é publicada aqui'))).toBe(true)
       expect(deps.createPullRequest).not.toHaveBeenCalled()
     },
   )
+
+  /*
+   * Quem não acha onde informar a chave de pessoa escreve na descrição. A
+   * recusa acontece aqui, antes do PR: o repositório é público e permanente,
+   * então não adianta o Moderador descobrir na revisão.
+   */
+  it.each([
+    ['descricao', 'Resgate de gatos. PIX 002.980.205-99, qualquer valor ajuda.'],
+    ['nome', 'Gatinhos do Bairro 11994773463'],
+  ])('chave de pessoa em %s é recusada sem abrir PR', async (campo, texto) => {
+    const deps = fakeDeps()
+    const result = await processRegistration(
+      { initiative: { ...validInitiative, [campo]: texto }, turnstileToken: 'token' },
+      deps,
+    )
+
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.status).toBe(422)
+    expect(result.errors).toContainEqual({
+      field: campo,
+      message: expect.stringContaining('Chave de pessoa não é publicada aqui'),
+    })
+    expect(deps.createPullRequest).not.toHaveBeenCalled()
+  })
 
   it('Turnstile reprovado bloqueia sem chamar o GitHub', async () => {
     const deps = fakeDeps({ verifyTurnstile: vi.fn(async () => false) })

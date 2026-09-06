@@ -1,6 +1,12 @@
 import { z } from 'zod'
 import { isCnpj } from '../cnpj.ts'
 import { municipiosPorUf } from '../municipios.ts'
+import {
+  containsPersonalPixKey,
+  looksLikePersonalPixKey,
+  personalKeyInKeyFieldMessage,
+  personalKeyInTextMessage,
+} from './personal-data.ts'
 import { initiativeTypes, needs, species, states } from './vocabulary.ts'
 
 /**
@@ -20,6 +26,13 @@ import { initiativeTypes, needs, species, states } from './vocabulary.ts'
  */
 export * from './vocabulary.ts'
 
+/*
+ * O detector de chave de pessoa sai por aqui pelo mesmo motivo: o formulário
+ * importa do schema, e a política mora em `./personal-data.ts` só para não
+ * arrastar o zod e os municípios para quem só precisa dela.
+ */
+export * from './personal-data.ts'
+
 /**
  * Municípios da UF, em ordem alfabética, direto da lista do IBGE (ver
  * `scripts/build-municipios.ts`). UF que não existe devolve lista vazia, para
@@ -28,38 +41,10 @@ export * from './vocabulary.ts'
 export const citiesOf = (uf: string): readonly string[] =>
   municipiosPorUf[uf as keyof typeof municipiosPorUf] ?? []
 
-/**
- * Política de dados pessoais (ver CONTEXT.md e docs/adr/0006):
- * a única chave PIX publicada é o CNPJ, dado empresarial público. Chave de
- * pessoa física — CPF, e-mail ou telefone — nunca é republicada: a doação
- * entra como pix-na-fonte e o site aponta para o canal oficial onde ela está.
- */
-const looksLikeCpf = (value: string) =>
-  /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(value) || /^\d{11}$/.test(value)
-
-const looksLikeEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-
-/**
- * Telefone com ou sem DDI, formatado ou cru. O teto de 13 dígitos é o que
- * separa telefone de CNPJ cru (14): sem ele, um CNPJ válido cairia aqui.
- */
-const looksLikePhone = (value: string) => {
-  const digits = value.replace(/\D/g, '')
-  return /^[\d\s()+-]+$/.test(value.trim()) && digits.length >= 10 && digits.length <= 13
-}
-
-/**
- * Chave de doação que identifica uma pessoa física. O formulário usa isto para
- * oferecer `pix-na-fonte` na hora da digitação, em vez de deixar a pessoa
- * descobrir a recusa só no envio. A autoridade continua sendo o schema abaixo.
- */
-export const looksLikePersonalPixKey = (value: string) =>
-  looksLikeCpf(value) || looksLikeEmail(value) || looksLikePhone(value)
-
 const cnpj = z
   .string()
   .refine((value) => !looksLikePersonalPixKey(value), {
-    message: 'chave de pessoa física não é publicada: use o tipo pix-na-fonte (ver CONTEXT.md)',
+    message: personalKeyInKeyFieldMessage,
   })
   .refine(isCnpj, {
     message: 'chave de pix-cnpj deve ser um CNPJ, numérico ou alfanumérico '
@@ -116,6 +101,17 @@ const imagePath = z
     'imagem deve ser um arquivo /imagens/iniciativas/<slug>.webp versionado no repositório',
   )
 
+/**
+ * Texto livre publicado como veio. Nome e descrição viram página pública e
+ * pull request permanente, então a política que barra chave de pessoa no campo
+ * de chave vale aqui também: quem não acha onde informar a chave escreve na
+ * descrição e manda o print junto, e a recusa precisa vir antes do pull request.
+ */
+const freeText = z
+  .string()
+  .min(1)
+  .refine((value) => !containsPersonalPixKey(value), { message: personalKeyInTextMessage })
+
 const verificationSchema = z.union([
   z.literal(false),
   z.strictObject({
@@ -125,11 +121,11 @@ const verificationSchema = z.union([
 ])
 
 export const initiativeSchema = z.object({
-  nome: z.string().min(1),
+  nome: freeText,
   tipo: z.enum(initiativeTypes),
   estado: z.enum(states),
   cidade: z.string().min(1),
-  descricao: z.string().min(1),
+  descricao: freeText,
   especies: z.array(z.enum(species)).optional(),
   necessidades: z.array(z.enum(needs)).optional(),
   doacoes: z.array(donationSchema).optional(),
