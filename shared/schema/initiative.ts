@@ -59,7 +59,7 @@ export const looksLikePersonalPixKey = (value: string) =>
 const cnpj = z
   .string()
   .refine((value) => !looksLikePersonalPixKey(value), {
-    message: 'chave de pessoa física não é publicada: use o tipo pix-na-fonte (ver CONTEXT.md)',
+    message: 'chave de pessoa física não é publicada: use o tipo pix-na-fonte (política em /privacidade)',
   })
   .refine(isCnpj, {
     message: 'chave de pix-cnpj deve ser um CNPJ, numérico ou alfanumérico '

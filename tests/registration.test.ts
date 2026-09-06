@@ -61,6 +61,36 @@ describe('processRegistration', () => {
     expect(call.title).toContain('Gatinhos do Bairro')
   })
 
+  /*
+   * Quem preenche cola o link do app, e o app cola o rastreio junto. O YAML vai
+   * para um repositório público e fica no histórico: a limpeza é aqui, e não só
+   * no formulário, porque este é o ponto por onde todo Cadastro passa antes de
+   * virar arquivo (ver shared/donation-source.ts).
+   */
+  it('Fonte colada do app é gravada sem o rastreio de compartilhamento', async () => {
+    const deps = fakeDeps()
+    const result = await processRegistration(
+      {
+        initiative: {
+          ...validInitiative,
+          doacoes: [{
+            tipo: 'pix-na-fonte',
+            fonte: 'https://www.instagram.com/gatinhosdobairro?stkn=AbCdEf123',
+          }],
+        },
+        turnstileToken: 'token',
+      },
+      deps,
+    )
+
+    expect(result.ok).toBe(true)
+    const call = vi.mocked(deps.createPullRequest).mock.calls[0]![0]
+    const written = parse(call.files[0]!.content)
+    expect(written.doacoes[0].fonte).toBe('https://www.instagram.com/gatinhosdobairro')
+    // O corpo do PR mostra ao Moderador a Fonte que foi gravada, não a colada
+    expect(call.body).not.toContain('stkn')
+  })
+
   it('payload inválido retorna erros campo a campo sem chamar o GitHub', async () => {
     const deps = fakeDeps()
     const result = await processRegistration(
