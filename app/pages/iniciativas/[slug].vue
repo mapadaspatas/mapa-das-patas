@@ -44,8 +44,9 @@ useSeoMeta({
   // Só a foto que a própria Iniciativa enviou. Sem foto, nenhum og:image:
   // um placeholder genérico no card do WhatsApp engana mais do que ajuda.
   ogImage: initiative.value.imagem ? `${siteUrl}${initiative.value.imagem}` : undefined,
-  // A imagem é quadrada (ver docs/adr/0003), então o card pequeno a mostra
-  // inteira; o grande cortaria as laterais.
+  // A Imagem entra pelo Cadastro já recortada em quadrado no navegador de quem
+  // envia, e nunca é buscada em rede social. Sendo sempre quadrada, o card
+  // pequeno a mostra inteira; o grande cortaria as laterais.
   twitterCard: 'summary',
 })
 

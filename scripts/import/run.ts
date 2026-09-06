@@ -1,7 +1,8 @@
 /**
  * Importação one-off da planilha original (já extraída para JSON local).
  * Gera um YAML por Iniciativa em content/iniciativas/ e um relatório de
- * conferência manual em .scratch/mapa-das-patas/conferencia-importacao.md.
+ * conferência manual, escrito fora da árvore versionada (o caminho está no fim
+ * deste arquivo): ele nasce da rodada, não é documento a consultar antes.
  *
  * Uso: node scripts/import/run.ts <caminho-do-json-de-linhas>
  * O JSON (com dados brutos, inclusive CPFs) fica FORA do repositório.
@@ -52,7 +53,8 @@ física (CPF, e-mail, telefone) virou \`pix-na-fonte\`; descrições geradas
 genericamente, a melhorar com a comunidade; tipo e espécies inferidos do nome.
 
 Nenhum item cita o valor de uma chave descartada: este arquivo é versionado no
-repositório público, e citá-lo republicaria o dado que o ADR 0006 tirou do site.
+repositório público, e citá-lo republicaria a chave de pessoa física que a
+regra de dados pessoais mantém fora do site.
 
 ${checklist.join('\n\n')}
 `

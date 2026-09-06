@@ -14,7 +14,12 @@ export const removalKinds = ['oposicao', 'eliminacao'] as const
 const removalSchema = z.strictObject({
   slug: z.string().regex(/^[a-z0-9-]+$/, 'slug deve ser o nome do arquivo YAML, sem .yml'),
   em: z.iso.date(),
-  /** `eliminacao` também reescreve o histórico Git (ver docs/adr/0005). */
+  /**
+   * `oposicao` é a remoção simples: um PR apaga o arquivo e a Iniciativa sai do
+   * site na próxima publicação, com o histórico intacto. `eliminacao` vai além
+   * e reescreve o histórico Git, para o dado não continuar legível num commit
+   * antigo. Os dois são atendidos sem pedir explicação.
+   */
   pedido: z.enum(removalKinds),
 })
 

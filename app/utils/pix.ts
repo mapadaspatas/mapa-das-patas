@@ -5,7 +5,8 @@ import type { Donation } from '../../shared/schema/initiative'
  * BR Code: o "PIX Copia e Cola" que também vira QR Code na tela de doação.
  *
  * O código é montado aqui, no navegador, a partir da mesma chave já publicada
- * na página (que por sua vez só entra no site com Fonte, ver CONTEXT.md).
+ * na página (que por sua vez só entra no site acompanhada da Fonte, o link
+ * público oficial da própria Iniciativa onde a chave aparece).
  * Nada é gerado por serviço externo: mandar a chave de uma Iniciativa para uma
  * API de terceiros para desenhar um QR seria confiar a parte mais sensível do
  * site a alguém de fora, e ainda quebraria a doação se o serviço saísse do ar.
@@ -61,8 +62,11 @@ export function crc16(payload: string): string {
  * Tiramos os separadores, e não tudo o que não é dígito, porque o CNPJ
  * alfanumérico tem letra nas 12 primeiras posições (ver shared/cnpj.ts).
  *
- * Só o CNPJ é publicado como chave (ver docs/adr/0006), então só ele tem
- * BR Code: doação de pessoa física é `pix-na-fonte` e retorna `undefined`.
+ * Só o CNPJ é publicado como chave: é dado empresarial público, de titularidade
+ * da pessoa jurídica. Chave de pessoa física (CPF, e-mail, telefone) nunca é
+ * republicada aqui, nem autodivulgada pela Iniciativa, nem com Fonte. Então só
+ * o CNPJ tem BR Code: doação de pessoa física é `pix-na-fonte`, não tem chave
+ * na página, e esta função devolve `undefined`.
  */
 export function pixKeyOf(donation: Donation): string | undefined {
   return donation.tipo === 'pix-cnpj' ? cnpjChars(donation.chave) : undefined

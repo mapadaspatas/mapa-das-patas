@@ -6,10 +6,12 @@ export { generateSlug }
 
 /**
  * Transformação pura das linhas da planilha original em Iniciativas.
- * Aplica as regras de dados pessoais da spec/CONTEXT.md:
- * - CNPJ publica direto, por ser dado empresarial público;
- * - chave de pessoa física (CPF, e-mail, telefone) NUNCA é republicada e vira
- *   pix-na-fonte, apontando para o canal oficial (ver docs/adr/0006);
+ * Aplica as regras de dados pessoais que o site inteiro segue:
+ * - CNPJ publica direto, por ser dado empresarial público, de titularidade da
+ *   pessoa jurídica;
+ * - chave de pessoa física (CPF, e-mail, telefone) NUNCA é republicada, nem
+ *   autodivulgada pela própria Iniciativa, nem com Fonte: vira pix-na-fonte, e
+ *   o site manda o doador ao canal oficial onde a chave está;
  * - valor que não casa com nenhum formato conhecido é reportado.
  */
 
@@ -114,7 +116,8 @@ export function transformRow(row: SpreadsheetRow): RowResult {
       /*
        * Chave de pessoa física: o site não a republica, aponta para a Fonte.
        * Sem aviso de conferência porque não há o que conferir — nenhum desses
-       * valores volta a ser chave publicada depois (ver docs/adr/0006).
+       * valores volta a ser chave publicada depois, em nenhuma circunstância,
+       * então não existe decisão pendente para um Moderador tomar.
        */
       needsPixAtSource = true
     } else if (/^(linktr\.ee|linkbio\.co|bio\.site|linkme\.bio|apoia\.se|vakinha\.|www\.|https?:\/\/)/.test(value)) {
