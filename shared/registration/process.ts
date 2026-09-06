@@ -1,6 +1,7 @@
 import { stringify } from 'yaml'
 import { z } from 'zod'
-import { imagePathOf, initiativeSchema, type Initiative } from '../schema/initiative'
+import { canonicalSource } from '../donation-source'
+import { type Donation, imagePathOf, initiativeSchema, type Initiative } from '../schema/initiative'
 import { generateSlug } from '../slug'
 import { checkImageBase64 } from './image'
 
@@ -189,9 +190,22 @@ export async function processRegistration(
   // Na correção sem novo upload, a imagem já publicada é mantida; em qualquer
   // caso o caminho é reescrito a partir do slug, nunca aceito como veio.
   const hasImage = submittedImage !== undefined || parsed.data.imagem !== undefined
-  const initiative: Initiative = hasImage
-    ? { ...parsed.data, imagem: imagePathOf(slug) }
-    : parsed.data
+
+  /*
+   * A Fonte é gravada sem o rastreio de compartilhamento que vem colado do app
+   * (ver shared/donation-source.ts). A limpeza é aqui, e não no formulário só,
+   * porque é este o ponto por onde todo Cadastro passa antes de virar arquivo —
+   * o campo do formulário faz o mesmo, mas para quem preenche ver o valor que vai.
+   */
+  const doacoes = parsed.data.doacoes?.map(
+    (donation): Donation => ({ ...donation, fonte: canonicalSource(donation.fonte) }),
+  )
+
+  const initiative: Initiative = {
+    ...parsed.data,
+    ...(doacoes ? { doacoes } : {}),
+    ...(hasImage ? { imagem: imagePathOf(slug) } : {}),
+  }
 
   const files: PullRequestFile[] = [
     { path: yamlPath, content: stringify(initiative), encoding: 'utf8' },
