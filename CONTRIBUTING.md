@@ -29,7 +29,7 @@ Obrigado por ajudar! Este guia espelha as regras publicadas em [/como-contribuir
 
 Vale para chave de pessoa em qualquer campo (inclusive nome e descrição) e para print de post ou de story enviado como Imagem:
 
-1. **Feche o PR sem mesclar.** Um comentário curto resolve, e ele não repete o dado: "Fechado porque traz chave de pessoa. Cadastre de novo escolhendo 'PIX no canal oficial' e o link do post onde a chave aparece."
+1. **Feche o PR sem mesclar.** Um comentário curto resolve, e ele não repete o dado: "Fechado porque traz chave de pessoa. Cadastre de novo respondendo que a chave é de uma pessoa, com o link do post onde ela aparece."
 2. **Apague a branch.**
 3. **Recrie o Cadastro limpo**, com `tipo: pix-na-fonte` e a Fonte apontando para o post ou bio onde a chave está.
 

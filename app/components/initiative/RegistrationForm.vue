@@ -15,7 +15,7 @@ import {
   usesDonationUrl,
 } from '~~/shared/schema/initiative'
 import type { Collections } from '@nuxt/content'
-import type { DonationType } from '~~/shared/schema/initiative'
+import type { DonationType, PixDonationType } from '~~/shared/schema/initiative'
 import type { FieldError, RegistrationResult } from '~~/shared/registration/process'
 
 /*
@@ -213,10 +213,19 @@ const donationOptions = [
     .map((v) => ({ label: donationLabels[v], value: v as string })),
 ]
 
-const pixOwnerOptions = [
-  { label: t.pixOwnerCnpj, value: 'pix-cnpj' },
-  { label: t.pixOwnerPerson, value: 'pix-na-fonte' },
-]
+/*
+ * As respostas são os dois tipos de PIX do schema, com o rótulo que responde à
+ * pergunta. O Record obriga um tipo de PIX novo a ganhar resposta aqui, do mesmo
+ * jeito que o `donationTypeMetadata` obriga a declarar a forma dele.
+ */
+const pixOwnerLabels = {
+  'pix-cnpj': t.pixOwnerCnpj,
+  'pix-na-fonte': t.pixOwnerPerson,
+} as const satisfies Record<PixDonationType, string>
+
+const pixOwnerOptions = donationTypes
+  .filter(isPixDonation)
+  .map((type) => ({ label: pixOwnerLabels[type], value: type as string }))
 
 const socialFields = t.socialFields
 
@@ -229,7 +238,7 @@ function donationKindOf(row: DonationRow) {
   return isPixRow(row.type) ? pixUndecided : row.type
 }
 
-function onDonationKind(row: DonationRow, kind: string) {
+function chooseDonationKind(row: DonationRow, kind: string) {
   // Reescolher "PIX" com a pergunta já respondida não apaga a resposta
   if (kind === pixUndecided && isPixRow(row.type)) return
   row.type = kind
@@ -363,27 +372,38 @@ function errorFor(field: string): string | undefined {
 }
 
 /**
- * Nome e descrição são publicados como vieram, e o schema recusa chave de
- * pessoa neles. Dizemos isso enquanto a pessoa digita, com o texto que a recusa
- * usaria: quem corrige antes de enviar nunca chega a ver o envio falhar.
+ * Erro a mostrar no campo de texto livre: o aviso de chave de pessoa enquanto a
+ * pessoa digita, ou o que o envio devolveu sobre aquele campo.
  *
- * Sem espera pelo blur, ao contrário do campo de chave: lá a máscara de CNPJ
- * passa por estados que parecem telefone, aqui não há máscara nenhuma. O erro
- * que voltou do envio tem precedência, para a correção que falhou não sumir da
- * tela ao primeiro caractere digitado.
+ * Nome e descrição são publicados como vieram, e o schema recusa chave de pessoa
+ * neles. Dizemos isso com o texto que a recusa usaria, e sem esperar o blur (ao
+ * contrário do campo de chave, onde a máscara de CNPJ passa por estados que
+ * parecem telefone): quem corrige antes de enviar nunca vê o envio falhar.
  */
-function personalKeyIn(text: string): string | undefined {
-  return containsPersonalPixKey(text) ? t.personalKeyInText : undefined
+function textFieldError(field: string, text: string): string | undefined {
+  if (containsPersonalPixKey(text)) return t.personalKeyInText
+  /*
+   * O erro que voltou do envio repete esta mesma regra sobre este mesmo texto,
+   * então ele já foi respondido: mantê-lo na tela deixaria a frase vermelha
+   * depois de a pessoa corrigir. Os outros erros do campo continuam valendo.
+   */
+  const error = errorFor(field)
+  return error === t.personalKeyInText ? undefined : error
 }
 
 /**
  * Em `pix-na-fonte` a Fonte é a resposta à pergunta "e a chave, então?": é o
- * link que o site publica no lugar dela. O aviso da correção, quando há, vem
- * antes: ele fala de algo que a pessoa precisa refazer agora.
+ * link que o site publica no lugar dela, e dizer isso vem antes de qualquer
+ * outro aviso do campo.
  */
 function sourceHelp(row: DonationRow) {
-  if (row.sourceCleared) return t.sourceClearedWarning
-  return row.type === 'pix-na-fonte' ? t.pixAtSourceHelp : undefined
+  /*
+   * Em correção, responder "pessoa" limpa a chave e faz a Fonte ser pedida de
+   * novo, o que acionaria o aviso de chave alterada. Não é o caso: a chave não
+   * mudou, ela deixou de ser publicada, e é isso que a pessoa precisa ler.
+   */
+  if (row.type === 'pix-na-fonte') return t.pixAtSourceHelp
+  return row.sourceCleared ? t.sourceClearedWarning : undefined
 }
 
 /**
@@ -480,7 +500,7 @@ async function startOver() {
         <!-- Dados -->
         <section class="space-y-4">
           <h2 class="font-display text-xl font-semibold text-highlighted">{{ t.dataSection }}</h2>
-          <UFormField :label="t.name" required :error="errorFor('nome') ?? personalKeyIn(form.name)">
+          <UFormField :label="t.name" required :error="textFieldError('nome', form.name)">
             <UInput v-model="form.name" class="w-full" />
           </UFormField>
           <div class="grid gap-4 sm:grid-cols-3">
@@ -508,7 +528,7 @@ async function startOver() {
             :label="t.description"
             required
             :help="t.descriptionHelp"
-            :error="errorFor('descricao') ?? personalKeyIn(form.description)"
+            :error="textFieldError('descricao', form.description)"
           >
             <UTextarea v-model="form.description" :rows="3" class="w-full" />
           </UFormField>
@@ -613,7 +633,7 @@ async function startOver() {
                   :model-value="donationKindOf(row)"
                   :items="donationOptions"
                   class="w-full"
-                  @update:model-value="onDonationKind(row, String($event))"
+                  @update:model-value="chooseDonationKind(row, String($event))"
                 />
               </UFormField>
               <UButton

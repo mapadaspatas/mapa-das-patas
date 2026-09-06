@@ -84,4 +84,4 @@ export const personalKeyInTextMessage =
 /** A mesma recusa no campo de chave, onde a saída é trocar o tipo da doação. */
 export const personalKeyInKeyFieldMessage =
   'Chave de pessoa não é publicada aqui: só publicamos chave de CNPJ. '
-  + 'Escolha "PIX no canal oficial" e informe o link do post onde a chave aparece.'
+  + 'Responda que a chave é de uma pessoa e informe o link do post onde ela aparece.'

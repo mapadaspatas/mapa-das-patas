@@ -290,8 +290,11 @@ describe('chave de pessoa em nome e descrição', () => {
 
   it.each([
     ['CPF pontuado', 'Gatil Hope 002.980.205-99'],
+    ['CPF cru', 'Gatil Hope 00298020599'],
     ['e-mail', 'Gatil Hope doacao@exemplo.org'],
-    ['telefone', 'Gatil Hope (11) 99477-3463'],
+    ['telefone com DDI', 'Gatil Hope +55 11 99477-3463'],
+    ['telefone com DDD entre parênteses', 'Gatil Hope (11) 99477-3463'],
+    ['telefone cru', 'Gatil Hope 11994773463'],
     ['chave aleatória', 'Gatil Hope 123e4567-e89b-12d3-a456-426614174000'],
   ])('rejeita %s no nome', (_caso, nome) => {
     expect(withName(nome).success).toBe(false)

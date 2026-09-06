@@ -137,7 +137,7 @@ export const strings = {
     removeDonation: 'Remover',
     personalKeyWarningTitle: 'Isso parece uma chave pessoal',
     personalKeyWarningText:
-      'Só publicamos CNPJ como chave PIX. CPF, e-mail e telefone identificam uma pessoa, e não são republicados aqui. Use a opção "PIX (no canal oficial)": mostramos ao doador o link oficial onde a chave está.',
+      'Só publicamos CNPJ como chave PIX. CPF, e-mail e telefone identificam uma pessoa, e não são republicados aqui. Responda que a chave é de uma pessoa: mostramos ao doador o link oficial onde a chave está.',
     /*
      * O mesmo texto que o schema devolve na recusa (ver
      * shared/schema/personal-data.ts). Aparece enquanto se digita o nome ou a
@@ -146,7 +146,7 @@ export const strings = {
      * dizerem coisas diferentes sobre a mesma regra.
      */
     personalKeyInText: personalKeyInTextMessage,
-    usePixAtSource: 'Usar PIX no canal oficial',
+    usePixAtSource: 'A chave é de uma pessoa',
     publicNoticeTitle: 'O que você enviar fica público',
     publicNoticeText:
       'O cadastro vira uma proposta pública no repositório do projeto, com tudo o que você digitou e enviou, inclusive a imagem, e o registro é permanente mesmo se a proposta for recusada. Não pedimos o seu nome nem o seu contato: envie só dados que a própria iniciativa já divulga publicamente.',

@@ -66,11 +66,20 @@ export const usesDonationKey = (type: string) =>
   donationTypeMetadata[type as DonationType]?.field === 'key'
 
 /**
+ * Os tipos de doação que são PIX, derivados da metadata em vez de listados de
+ * novo: é o que faz um tipo de PIX novo aparecer sozinho onde o formulário
+ * pergunta de quem é a chave, em vez de sumir de lá em silêncio.
+ */
+export type PixDonationType = {
+  [Type in DonationType]: (typeof donationTypeMetadata)[Type]['isPix'] extends true ? Type : never
+}[DonationType]
+
+/**
  * Este tipo de doação é PIX, publicando a chave ou apontando para a Fonte? O
  * formulário pergunta de quem é a chave antes de escolher entre os dois, então
  * precisa tratá-los como uma coisa só até ter a resposta.
  */
-export const isPixDonation = (type: string) =>
+export const isPixDonation = (type: string): type is PixDonationType =>
   donationTypeMetadata[type as DonationType]?.isPix === true
 
 /** Este tipo de doação publica um link de campanha externa? */
