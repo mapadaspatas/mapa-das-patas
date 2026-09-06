@@ -24,7 +24,23 @@ const publicAnalyticsUrl = useRuntimeConfig().public.umamiPublicUrl
             claro (e vice-versa) sem mexer no sistema operacional.
           -->
           <UColorModeButton />
-          <UButton to="/cadastrar" color="primary">
+          <!--
+            Abaixo de sm o "Cadastrar" fica só no ícone. Com a palavra inteira,
+            o cabeçalho não cabia num aparelho de 320px: o nome do site, o botão
+            de tema e o "Cadastrar" somavam 332px, e a página inteira rolava
+            para o lado. São dois botões e não um com o texto escondido porque
+            de sm para cima o cabeçalho precisa ficar igual ao de sempre. O
+            rótulo continua no aria-label, então quem usa leitor de tela ouve
+            "Cadastrar" nas duas larguras.
+          -->
+          <UButton
+            to="/cadastrar"
+            color="primary"
+            icon="i-lucide-plus"
+            :aria-label="strings.nav.register"
+            class="sm:hidden"
+          />
+          <UButton to="/cadastrar" color="primary" class="max-sm:hidden">
             {{ strings.nav.register }}
           </UButton>
         </nav>
