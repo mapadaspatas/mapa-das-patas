@@ -1,0 +1,20 @@
+nome: Abrigo da Márcia
+tipo: abrigo-santuario
+estado: SP
+cidade: Ribeirão Preto
+descricao: O abrigo cuida de 120 cães e é mantido por meio de doações.
+especies:
+  - caes
+necessidades:
+  - racao
+  - lar-temporario
+  - castracao
+  - voluntarios
+  - medicamentos
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://www.instagram.com/abrigodamarcia
+redes:
+  instagram: abrigodamarcia
+  site: https://abrigodamarcia.com.br/
+imagem: /imagens/iniciativas/abrigo-da-marcia.webp
