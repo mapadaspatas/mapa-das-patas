@@ -171,6 +171,45 @@ function clearFilters() {
   for (const field of Object.keys(filters) as (keyof FilterState)[]) filters[field] = ''
 }
 
+/** Nome do estado por extenso; UF que não conhecemos volta como veio da URL. */
+function stateName(uf: string) {
+  return ufShapes[uf as keyof typeof ufShapes]?.nome ?? uf
+}
+
+/**
+ * Um chip por filtro em vigor, cada um removível sozinho. Com Estado, Espécie
+ * e Tipo aplicados ao mesmo tempo, a única saída era "Limpar filtros", que
+ * apaga tudo: quem queria alargar a busca em um critério tinha que recomeçar
+ * pelos cinco. O valor aparece com o rótulo que a pessoa leu no controle, e
+ * nunca o valor canônico do schema (`abrigo-santuario`, `lar-temporario`), que
+ * não é para ser lido.
+ */
+const activeChips = computed(() => {
+  const labelOf: Record<keyof FilterState, (value: string) => string> = {
+    search: (value) => value,
+    state: stateName,
+    city: (value) => value,
+    type: (value) => typeLabels[value as keyof typeof typeLabels] ?? value,
+    species: (value) => speciesLabels[value as keyof typeof speciesLabels] ?? value,
+    need: (value) => needLabels[value as keyof typeof needLabels] ?? value,
+  }
+  const criterionOf: Record<keyof FilterState, string> = {
+    search: strings.list.searchFilter,
+    state: strings.list.stateFilter,
+    city: strings.list.cityFilter,
+    type: strings.list.typeFilter,
+    species: strings.list.speciesFilter,
+    need: strings.list.needFilter,
+  }
+  return (Object.keys(criterionOf) as (keyof FilterState)[])
+    .filter((field) => filters[field])
+    .map((field) => ({
+      field,
+      criterion: criterionOf[field],
+      value: labelOf[field](filters[field]),
+    }))
+})
+
 /**
  * O mapa é o primeiro bloco da coluna de controles e ocupa 368px: no celular
  * ele empurrava a busca para 597px e o primeiro card para 944px, uma tela e
@@ -290,6 +329,36 @@ function toggleState(uf: string) {
 
       <!-- Resultados -->
       <div>
+        <!--
+          Sem filtro em vigor o bloco não existe: nada de espaço reservado
+          esperando por chip, que só empurraria os resultados para baixo.
+        -->
+        <div
+          v-if="activeChips.length"
+          role="group"
+          :aria-label="strings.list.activeFilters"
+          class="mb-4 flex flex-wrap gap-2"
+        >
+          <!--
+            O chip inteiro é o botão de remover, e não um texto com um "x"
+            colado do lado: no celular o alvo de toque é a peça toda. O
+            aria-label diz o critério e o valor, porque "Tirar" sozinho, lido em
+            sequência seis vezes, não distingue um chip do outro.
+          -->
+          <UButton
+            v-for="chip in activeChips"
+            :key="chip.field"
+            color="neutral"
+            variant="soft"
+            size="xs"
+            trailing-icon="i-lucide-x"
+            :aria-label="strings.list.removeFilter(chip.criterion, chip.value)"
+            @click="filters[chip.field] = ''"
+          >
+            {{ strings.list.activeFilter(chip.criterion, chip.value) }}
+          </UButton>
+        </div>
+
         <p class="font-mono text-xs text-muted" aria-live="polite">
           {{ strings.list.results(results.length) }}
         </p>
