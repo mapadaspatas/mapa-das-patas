@@ -3,6 +3,7 @@ import { cnpjChars, formatCnpj, isCnpjMaskable } from '~~/shared/cnpj'
 import { instagramHandle } from '~~/shared/instagram'
 import {
   citiesOf,
+  containsPersonalPixKey,
   donationTypes,
   initiativeTypes,
   looksLikePersonalPixKey,
@@ -317,6 +318,20 @@ function errorFor(field: string): string | undefined {
   return errors.value.find((e) => e.field === field)?.message
 }
 
+/**
+ * Nome e descrição são publicados como vieram, e o schema recusa chave de
+ * pessoa neles. Dizemos isso enquanto a pessoa digita, com o texto que a recusa
+ * usaria: quem corrige antes de enviar nunca chega a ver o envio falhar.
+ *
+ * Sem espera pelo blur, ao contrário do campo de chave: lá a máscara de CNPJ
+ * passa por estados que parecem telefone, aqui não há máscara nenhuma. O erro
+ * que voltou do envio tem precedência, para a correção que falhou não sumir da
+ * tela ao primeiro caractere digitado.
+ */
+function personalKeyIn(text: string): string | undefined {
+  return containsPersonalPixKey(text) ? t.personalKeyInText : undefined
+}
+
 const analytics = useAnalytics()
 
 async function submit() {
@@ -393,7 +408,7 @@ async function startOver() {
         <!-- Dados -->
         <section class="space-y-4">
           <h2 class="font-display text-xl font-semibold text-highlighted">{{ t.dataSection }}</h2>
-          <UFormField :label="t.name" required :error="errorFor('nome')">
+          <UFormField :label="t.name" required :error="errorFor('nome') ?? personalKeyIn(form.name)">
             <UInput v-model="form.name" class="w-full" />
           </UFormField>
           <div class="grid gap-4 sm:grid-cols-3">
@@ -417,7 +432,12 @@ async function startOver() {
               </USelectMenu>
             </UFormField>
           </div>
-          <UFormField :label="t.description" required :help="t.descriptionHelp" :error="errorFor('descricao')">
+          <UFormField
+            :label="t.description"
+            required
+            :help="t.descriptionHelp"
+            :error="errorFor('descricao') ?? personalKeyIn(form.description)"
+          >
             <UTextarea v-model="form.description" :rows="3" class="w-full" />
           </UFormField>
           <div class="grid gap-4 sm:grid-cols-2">

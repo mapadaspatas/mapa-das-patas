@@ -1,3 +1,5 @@
+import { personalKeyInTextMessage } from '../../shared/schema/personal-data'
+
 /**
  * Strings de interface centralizadas (pt-BR).
  * Nenhuma página deve hardcodar texto de UI: tudo vem daqui.
@@ -129,6 +131,14 @@ export const strings = {
     personalKeyWarningTitle: 'Isso parece uma chave pessoal',
     personalKeyWarningText:
       'Só publicamos CNPJ como chave PIX. CPF, e-mail e telefone identificam uma pessoa, e não são republicados aqui. Use a opção "PIX (no canal oficial)": mostramos ao doador o link oficial onde a chave está.',
+    /*
+     * O mesmo texto que o schema devolve na recusa (ver
+     * shared/schema/personal-data.ts). Aparece enquanto se digita o nome ou a
+     * descrição, para a pessoa corrigir antes de enviar em vez de descobrir a
+     * recusa depois — e é o mesmo texto justamente para os dois momentos não
+     * dizerem coisas diferentes sobre a mesma regra.
+     */
+    personalKeyInText: personalKeyInTextMessage,
     usePixAtSource: 'Usar PIX no canal oficial',
     publicNoticeTitle: 'O que você enviar fica público',
     publicNoticeText:
