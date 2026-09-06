@@ -76,7 +76,9 @@ export const strings = {
     needs: 'Necessidades atuais',
     imageSection: 'Foto da iniciativa',
     imageHelp:
-      'Opcional. Vale a foto de perfil do Instagram, o logo ou uma foto dos animais. Ela é recortada em quadrado e reduzida aqui no seu navegador antes do envio.',
+      'Opcional. Foto de perfil, logo ou foto dos animais. Não envie print de post ou de story.',
+    imageProcessing:
+      'Ela é recortada em quadrado e reduzida aqui no seu navegador antes do envio.',
     imageConsent:
       'Envie só imagem que a própria iniciativa publica ou autorizou. Ela fica pública no site e no repositório.',
     imageChoose: 'Escolher imagem',
@@ -98,7 +100,6 @@ export const strings = {
       { key: 'site', label: 'Site', placeholder: 'https://…' },
       { key: 'linktree', label: 'Linktree / link na bio', placeholder: 'https://linktr.ee/…' },
     ],
-    pixAtOfficialChannel: 'PIX (no canal oficial)',
     sourceClearedWarning: 'Você alterou a chave. Informe a Fonte onde a nova chave aparece.',
     connectionFailure: 'Falha de conexão. Tente novamente.',
     unexpectedFailure:
@@ -108,6 +109,12 @@ export const strings = {
     sourceRule:
       'Regra nº 1: toda chave de doação precisa de uma Fonte, o link do post ou bio oficial onde a própria iniciativa divulga essa chave. Sem Fonte, o cadastro não é aprovado.',
     donationType: 'Tipo',
+    donationPix: 'PIX',
+    pixOwnerQuestion: 'A chave é de CNPJ ou de uma pessoa?',
+    pixOwnerCnpj: 'De um CNPJ',
+    pixOwnerPerson: 'De uma pessoa',
+    pixOwnerRequired: 'Escolha se a chave é de CNPJ ou de uma pessoa.',
+    pixAtSourceHelp: 'O site vai apontar para esse link; a chave não é publicada aqui.',
     donationKey: 'Chave',
     donationUrl: 'Link da campanha',
     donationKeyPlaceholder: '00.000.000/0000-00',
@@ -128,8 +135,8 @@ export const strings = {
     removeDonation: 'Remover',
     personalKeyWarningTitle: 'Isso parece uma chave pessoal',
     personalKeyWarningText:
-      'Só publicamos CNPJ como chave PIX. CPF, e-mail e telefone identificam uma pessoa, e não são republicados aqui. Use a opção "PIX (no canal oficial)": mostramos ao doador o link oficial onde a chave está.',
-    usePixAtSource: 'Usar PIX no canal oficial',
+      'Só publicamos CNPJ como chave PIX. CPF, e-mail e telefone identificam uma pessoa, e não são republicados aqui. Responda que a chave é de uma pessoa: mostramos ao doador o link oficial onde a chave está.',
+    usePixAtSource: 'A chave é de uma pessoa',
     publicNoticeTitle: 'O que você enviar fica público',
     publicNoticeText:
       'O cadastro vira uma proposta pública no repositório do projeto, com tudo o que você digitou e enviou, inclusive a imagem, e o registro é permanente mesmo se a proposta for recusada. Não pedimos o seu nome nem o seu contato: envie só dados que a própria iniciativa já divulga publicamente.',

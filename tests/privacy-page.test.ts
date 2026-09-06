@@ -55,7 +55,7 @@ describe('recusa de chave pessoal', () => {
 
   const message = refused.success
     ? ''
-    : refused.error.issues.find((issue) => issue.message.includes('pessoa física'))?.message ?? ''
+    : refused.error.issues.find((issue) => issue.message.includes('não é publicada aqui'))?.message ?? ''
 
   it('manda para a página de privacidade, e não para um arquivo do repositório', () => {
     expect(message).toContain('/privacidade')
