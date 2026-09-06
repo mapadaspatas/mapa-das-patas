@@ -20,6 +20,9 @@ export const strings = {
         : `${n} estados ainda não têm nenhuma iniciativa cadastrada.`,
     gapsHint: (examples: string) => `Se você conhece alguma ${examples}, o cadastro leva dois minutos.`,
     clearState: 'Ver o Brasil inteiro',
+    showMap: 'Ver o mapa do Brasil',
+    showMapFiltered: (state: string) => `Ver o mapa do Brasil · filtro em ${state}`,
+    hideMap: 'Fechar o mapa',
     stateGroup: (name: string, n: number) =>
       `${name} · ${n === 1 ? '1 iniciativa' : `${n} iniciativas`}`,
   },

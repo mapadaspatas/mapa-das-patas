@@ -171,9 +171,34 @@ function clearFilters() {
   for (const field of Object.keys(filters) as (keyof FilterState)[]) filters[field] = ''
 }
 
+/**
+ * O mapa é o primeiro bloco da coluna de controles e ocupa 368px: no celular
+ * ele empurrava a busca para 597px e o primeiro card para 944px, uma tela e
+ * meia abaixo, e quem abria a listagem não via nem onde buscar. Abaixo de `lg`
+ * ele começa recolhido atrás deste controle; de `lg` para cima a coluna é fixa
+ * ao lado dos resultados, o mapa não atrapalha ninguém e continua sempre
+ * aberto, por classe do Tailwind e não por medida de tela em JavaScript (o
+ * site é gerado estático: uma media query em JS mudaria a tela na hidratação).
+ */
+const mapOpen = ref(false)
+
+const mapToggleLabel = computed(() => {
+  if (mapOpen.value) return strings.map.hideMap
+  if (!filters.state) return strings.map.showMap
+  /* Com o mapa recolhido, ele é o único lugar onde o estado escolhido aparece
+   * desenhado. O controle repete qual é, para o recolhimento não esconder um
+   * filtro em vigor de quem só olha o topo da página. */
+  return strings.map.showMapFiltered(ufShapes[filters.state as keyof typeof ufShapes]?.nome ?? filters.state)
+})
+
 /** Clicar de novo no estado já filtrado desliga o filtro. */
 function toggleState(uf: string) {
-  filters.state = filters.state === uf ? '' : uf
+  const selecting = filters.state !== uf
+  filters.state = selecting ? uf : ''
+  /* Escolheu um estado: o mapa cumpriu o papel e sai da frente dos resultados,
+   * que é o que a pessoa foi ver. Ao desligar o filtro pelo próprio mapa ele
+   * fica aberto, porque quem faz isso costuma estar trocando de estado. */
+  if (selecting) mapOpen.value = false
 }
 </script>
 
@@ -184,10 +209,32 @@ function toggleState(uf: string) {
     </h1>
     <p class="mt-1 text-muted">{{ strings.list.description }}</p>
 
-    <div class="mt-7 grid gap-8 lg:grid-cols-[17rem_1fr] lg:gap-10">
+    <!--
+      Abaixo de lg as duas colunas viram uma pilha, e o vão entre elas é altura
+      que empurra o primeiro resultado para fora da tela: aqui ele é menor que
+      o vão lateral do desktop, onde ele não custa nada.
+    -->
+    <div class="mt-7 grid gap-6 lg:grid-cols-[17rem_1fr] lg:gap-10">
       <!-- Controles: mapa e filtros, cada um com rótulo à vista -->
       <div class="lg:sticky lg:top-6 lg:self-start">
-        <div class="rounded-2xl border border-muted bg-elevated/40 p-4">
+        <UButton
+          class="w-full justify-center lg:hidden"
+          color="neutral"
+          variant="outline"
+          size="sm"
+          :icon="mapOpen ? 'i-lucide-chevron-up' : 'i-lucide-map'"
+          :aria-expanded="mapOpen"
+          aria-controls="mapa-da-listagem"
+          @click="mapOpen = !mapOpen"
+        >
+          {{ mapToggleLabel }}
+        </UButton>
+
+        <div
+          id="mapa-da-listagem"
+          class="rounded-2xl border border-muted bg-elevated/40 p-4 max-lg:mt-3"
+          :class="{ 'max-lg:hidden': !mapOpen }"
+        >
           <UfMap :counts="countsByState" :selected="filters.state" @select="toggleState" />
           <UButton
             v-if="filters.state"
@@ -206,7 +253,7 @@ function toggleState(uf: string) {
           v-model="filters.search"
           icon="i-lucide-search"
           size="lg"
-          class="mt-4 w-full"
+          class="mt-3 w-full lg:mt-4"
           :placeholder="strings.list.searchPlaceholder"
           :aria-label="strings.list.searchPlaceholder"
         />
