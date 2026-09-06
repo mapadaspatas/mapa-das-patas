@@ -22,14 +22,14 @@ jobs:
     name: Validar Iniciativas, testes e build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Sem `version`: a versão vem do campo `packageManager` do package.json.
       # Declarar as duas quebra o job ("Multiple versions of pnpm specified").
       # pnpm antes do setup-node: o cache do setup-node precisa dele no PATH.
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
