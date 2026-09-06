@@ -117,6 +117,21 @@ describe.each(enquadramentos)('cartão no enquadramento %s', (enquadramento) => 
     expect(textoImpresso(svg)).not.toContain('PB')
   })
 
+  /*
+   * O pior caso real do diretório: o nome mais longo gastando três linhas e a
+   * tarja do Selo entrando ao lado da cidade. É a combinação que aperta o vão
+   * até o rodapé, e a única que pode fazer `desenharCartao` falhar por altura.
+   */
+  it('acomoda o nome mais longo com o Selo junto, inclusive com QR', () => {
+    const pior = { ...maisLongo, verificado: true }
+    for (const dados of [pior, { ...pior, qr: '<rect width="10" height="10"/>' }]) {
+      const impresso = textoImpresso(desenharCartao(dados, enquadramento, medirComResvg))
+      expect(impresso).toContain('Verificada')
+      expect(impresso).toContain('Ribeirão Preto,')
+      expect(impresso).toContain(pior.endereco)
+    }
+  })
+
   it('vira um PNG válido', () => {
     const png = rasterizarComResvg(desenharCartao(maisLongo, enquadramento, medirComResvg))
     // Assinatura do formato: se o SVG fosse inválido, nem chegaria aqui.

@@ -112,15 +112,15 @@ async function share() {
         >
           {{ strings.detail.share }}
         </UButton>
-        <InitiativeShareCard
+        <InitiativePromote
           :slug="slug"
-          :nome="initiative.nome"
-          :cidade="initiative.cidade"
-          :estado="initiative.estado"
-          :verificado="Boolean(verification)"
-          :imagem="initiative.imagem ?? undefined"
+          :name="initiative.nome"
+          :city="initiative.cidade"
+          :state="initiative.estado"
+          :verified="Boolean(verification)"
+          :image="initiative.imagem ?? undefined"
           :url="pageUrl"
-          :doacoes="initiative.doacoes ?? undefined"
+          :donations="initiative.doacoes ?? undefined"
         />
       </div>
     </div>

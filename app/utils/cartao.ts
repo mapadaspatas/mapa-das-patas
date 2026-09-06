@@ -1,6 +1,6 @@
 /**
  * O Cartão de uma Iniciativa: o card que aparece ao colar o link em rede
- * social (1200x630) e a arte vertical de stories (1080x1920).
+ * social (1200x630) e o vertical de stories (1080x1920).
  *
  * Um desenho, dois enquadramentos. Cor, hierarquia tipográfica e cada elemento
  * (a foto, o nome, o lugar, o Selo, o endereço) são construídos uma vez só e
@@ -15,7 +15,7 @@
  *
  * Todo Cartão leva o endereço da página. É o que o separa do print que ele
  * substitui: quem recebe consegue conferir na origem, onde a chave e a Fonte
- * estão atualizadas, em vez de acreditar numa imagem.
+ * estão atualizadas, em vez de acreditar no que a peça diz.
  */
 import { initialsOf } from './avatar.ts'
 import {
@@ -37,14 +37,19 @@ import { strings } from './strings.ts'
 
 /**
  * Muda sempre que o desenho muda: cor, corpo, espaçamento, um elemento novo.
- * O gerador do build a inclui na chave do cache, então subir este número
- * redesenha o diretório inteiro no próximo build. Não subir depois de mexer
- * aqui deixa cartões velhos publicados sem ninguém perceber.
+ *
+ * Existe para o gerador do card de link poder incluí-la na chave do cache — aí
+ * subir este número redesenha o diretório inteiro, em vez de deixar cartão
+ * velho publicado sem ninguém perceber. Esse gerador ainda não foi escrito, e
+ * até ele existir nada aqui lê esta constante.
  */
 export const VERSAO_DO_DESENHO = 1
 
 export const ENQUADRAMENTOS = {
-  /** Card de link: o que WhatsApp, Telegram e Instagram leem do `og:image`. */
+  /**
+   * Card de link, no tamanho que WhatsApp, Telegram e Instagram esperam de um
+   * `og:image`. O desenho já sai; quem o rasteriza no build ainda não existe.
+   */
   link: { largura: 1200, altura: 630 },
   /** Vertical de stories, gerado no navegador de quem divulga. */
   stories: { largura: 1080, altura: 1920 },
@@ -67,8 +72,8 @@ export interface DadosDoCartao {
   /**
    * A Imagem que a própria Iniciativa enviou, já embutida como data URI. Tem
    * que vir embutida, e não como caminho: um `href` externo faria o navegador
-   * recusar o Canvas na hora de salvar. Sem Imagem, entra o avatar de iniciais,
-   * o mesmo fallback da listagem.
+   * recusar o Canvas na hora de salvar. Sem Imagem, entram as iniciais, como
+   * na listagem.
    */
   imagem?: string
   /**
@@ -141,9 +146,14 @@ function fracao(largura: number, chave: number) {
 }
 
 /**
- * Quadrado de cantos arredondados, na mesma proporção de raio do avatar do
- * site. Serve de moldura e de recorte, então sai sem preenchimento: quem chama
- * acrescenta o que precisa.
+ * Quadrado de cantos arredondados. Serve de moldura e de recorte, então sai sem
+ * preenchimento: quem chama acrescenta o que precisa.
+ *
+ * O raio é proporcional ao lado, e não fixo: a mesma peça é desenhada de 152px
+ * no card de link a 936px no story, e um raio fixo pareceria dois desenhos
+ * diferentes. Note que não é o avatar redondo da listagem — no Cartão a foto é
+ * o retrato da Iniciativa, com o peso de uma foto, e não um ícone ao lado do
+ * nome.
  */
 function quadradoArredondado(x: number, y: number, lado: number) {
   return `<rect x="${arredondar(x)}" y="${arredondar(y)}" width="${lado}" height="${lado}"`
@@ -151,10 +161,15 @@ function quadradoArredondado(x: number, y: number, lado: number) {
 }
 
 /**
- * A Imagem da Iniciativa, recortada no quadrado, ou o avatar de iniciais de
- * quem não enviou nenhuma. As iniciais saem de `initialsOf()`, a mesma função
- * do avatar da listagem, para o Cartão e o site nunca chamarem a Iniciativa de
- * duas coisas diferentes.
+ * A Imagem da Iniciativa, recortada no quadrado, ou as iniciais de quem não
+ * enviou nenhuma. As iniciais saem de `initialsOf()`, a mesma função do avatar
+ * da listagem, para o Cartão e o site nunca abreviarem a Iniciativa de dois
+ * jeitos diferentes.
+ *
+ * A cor, essa não vem de lá: a listagem varia o tom por nome para dar a cada
+ * Iniciativa a sua, num mosaico de dezenas delas. O Cartão mostra uma só, e
+ * sozinha o tom variável não distingue nada de nada, só faz a mesma Iniciativa
+ * sair de uma cor no story e de outra no card.
  */
 function foto(medir: Medir, dados: DadosDoCartao, x: number, y: number, lado: number) {
   if (dados.imagem) {
@@ -282,6 +297,122 @@ function qrCode(fragmento: string, x: number, y: number, lado: number) {
     + ` width="${arredondar(lado - respiro * 2)}" height="${arredondar(lado - respiro * 2)}">${fragmento}</svg>`
 }
 
+/** O vão entre a assinatura e o rodapé, que é onde a identidade é arrumada. */
+interface Vao {
+  largura: number
+  margem: number
+  util: number
+  topo: number
+  fim: number
+}
+
+/** Onde cada peça da identidade ficou, depois de arrumada no enquadramento. */
+interface Arrumacao {
+  fotoY: number
+  lado: number
+  colunaX: number
+  colunaTopo: number
+  nome: ReturnType<typeof ajustar>
+}
+
+/** O nome no maior corpo que couber na coluna, em largura e em altura. */
+function ajustarNome(medir: Medir, dados: DadosDoCartao, largura: number, altura: number, colunaLargura: number) {
+  return ajustar(medir, dados.nome, {
+    largura: colunaLargura,
+    linhas: LINHAS_DO_NOME,
+    teto: fracao(largura, PROPORCAO.nome),
+    altura,
+    entrelinha: ENTRELINHA_NOME,
+    familia: FAMILIA.display,
+    peso: 700,
+    espacejamento: ESPACEJAMENTO_DISPLAY,
+  })
+}
+
+/** Altura do nome mais o vão e o lugar que vêm abaixo dele. */
+function alturaDaColuna(medir: Medir, nome: Arrumacao['nome'], largura: number) {
+  return alturaDoBloco(medir, nome.linhas, nome.estilo, ENTRELINHA_NOME)
+    + fracao(largura, VAO.aposNome)
+    + fracao(largura, PROPORCAO.lugar) * 1.5
+}
+
+/**
+ * Centra a pilha no vão em vez de colá-la no topo: nome de uma linha e nome de
+ * três ficam ambos equilibrados entre a assinatura e o rodapé, sem deixar
+ * buraco embaixo.
+ */
+function centrar(vao: Vao, alturaDaPilha: number) {
+  return vao.topo + Math.max(0, (vao.fim - vao.topo - alturaDaPilha) / 2)
+}
+
+/**
+ * Deitado, a foto vai ao lado do texto. 630px de altura não comportam foto,
+ * nome e lugar empilhados sem espremer justamente o nome, que é o que o Cartão
+ * existe para dizer — então a foto tem tamanho fixo, a coluna fica com o resto
+ * da largura, e a altura toda do vão é do texto.
+ */
+function deitar(medir: Medir, dados: DadosDoCartao, vao: Vao): Arrumacao {
+  const { largura, margem, util } = vao
+  const lado = fracao(largura, PROPORCAO.fotoDeitado)
+  const aoLado = fracao(largura, VAO.aoLadoDaFoto)
+  const colunaX = margem + lado + aoLado
+
+  const nome = ajustarNome(
+    medir,
+    dados,
+    largura,
+    vao.fim - vao.topo - fracao(largura, VAO.aposNome) - fracao(largura, PROPORCAO.lugar) * 1.5,
+    util - lado - aoLado,
+  )
+  const alturaColuna = alturaDaColuna(medir, nome, largura)
+
+  // Foto e coluna são vizinhas: cada uma se centra na altura da outra.
+  const pilhaTopo = centrar(vao, Math.max(lado, alturaColuna))
+  return {
+    lado,
+    colunaX,
+    fotoY: pilhaTopo + Math.max(0, (alturaColuna - lado) / 2),
+    colunaTopo: pilhaTopo + Math.max(0, (lado - alturaColuna) / 2),
+    nome,
+  }
+}
+
+/**
+ * Em pé sobra altura, e a pilha é o que preenche o story: a foto fica com toda
+ * a altura que o texto deixou, até a largura útil, e é isso que faz o vertical
+ * parecer desenhado para o formato em vez de um card de link esticado. O
+ * avatar de iniciais para bem antes disso — ampliar duas letras até a largura
+ * da página não diz nada a mais sobre a Iniciativa.
+ */
+function empilhar(medir: Medir, dados: DadosDoCartao, vao: Vao): Arrumacao {
+  const { largura, margem, util } = vao
+  const aposFoto = fracao(largura, VAO.aposFoto)
+  const minima = fracao(largura, PROPORCAO.fotoMinima)
+
+  // A foto tem direito ao tamanho mínimo antes de o nome ocupar o que sobrar.
+  const nome = ajustarNome(
+    medir,
+    dados,
+    largura,
+    vao.fim - vao.topo - fracao(largura, VAO.aposNome)
+    - fracao(largura, PROPORCAO.lugar) * 1.5 - minima - aposFoto,
+    util,
+  )
+  const alturaColuna = alturaDaColuna(medir, nome, largura)
+
+  const teto = fracao(largura, dados.imagem ? PROPORCAO.fotoEmPe : PROPORCAO.avatarEmPe)
+  const lado = Math.max(minima, Math.min(teto, vao.fim - vao.topo - alturaColuna - aposFoto))
+  const pilhaTopo = centrar(vao, lado + aposFoto + alturaColuna)
+
+  return {
+    lado,
+    colunaX: margem,
+    fotoY: pilhaTopo,
+    colunaTopo: pilhaTopo + lado + aposFoto,
+    nome,
+  }
+}
+
 /**
  * O Cartão de uma Iniciativa, em SVG. Pura: os mesmos dados e o mesmo medidor
  * devolvem sempre a mesma string, que é o que permite o cache por hash do
@@ -319,83 +450,27 @@ export function desenharCartao(
     rodape = qrCode(dados.qr, margem, rodapeTopo, lado) + '\n  ' + rodape
   }
 
-  const conteudoTopo = marca.fim + fracao(largura, VAO.aposCabecalho)
-  const conteudoFim = rodapeTopo - fracao(largura, VAO.antesRodape)
-  const disponivel = conteudoFim - conteudoTopo
-
-  const alturaLugar = fracao(largura, PROPORCAO.lugar) * 1.5
-  const aposNome = fracao(largura, VAO.aposNome)
-  const aposFoto = fracao(largura, VAO.aposFoto)
-
-  /*
-   * Deitado, a foto vai ao lado do texto: 630px de altura não comportam foto,
-   * nome e lugar empilhados sem espremer o nome, que é o que o Cartão existe
-   * para dizer. Em pé sobra altura, e a pilha é o que preenche o story.
-   */
-  const ladoDeitado = fracao(largura, PROPORCAO.fotoDeitado)
-  const aoLado = fracao(largura, VAO.aoLadoDaFoto)
-  const colunaX = emPe ? margem : margem + ladoDeitado + aoLado
-  const colunaLargura = emPe ? util : util - ladoDeitado - aoLado
-
-  /*
-   * O nome cresce até o que couber na coluna, em largura e em altura. Em pé a
-   * foto tem direito ao seu tamanho mínimo antes de o nome ocupar o resto;
-   * deitado, os dois estão lado a lado e a altura toda é do texto.
-   */
-  const nome = ajustar(medir, dados.nome, {
-    largura: colunaLargura,
-    linhas: LINHAS_DO_NOME,
-    teto: fracao(largura, PROPORCAO.nome),
-    altura: disponivel - aposNome - alturaLugar
-      - (emPe ? fracao(largura, PROPORCAO.fotoMinima) + aposFoto : 0),
-    entrelinha: ENTRELINHA_NOME,
-    familia: FAMILIA.display,
-    peso: 700,
-    espacejamento: ESPACEJAMENTO_DISPLAY,
-  })
-
-  const alturaColuna = alturaDoBloco(medir, nome.linhas, nome.estilo, ENTRELINHA_NOME)
-    + aposNome + alturaLugar
-
-  /*
-   * Em pé, a foto fica com toda a altura que o texto deixou, até a largura
-   * útil: é o que faz o story parecer desenhado para o formato, e não um card
-   * de link esticado. O avatar de iniciais para bem antes disso — ampliar duas
-   * letras até a largura da página não diz nada a mais sobre a Iniciativa.
-   */
-  const tetoDaFoto = fracao(largura, dados.imagem ? PROPORCAO.fotoEmPe : PROPORCAO.avatarEmPe)
-  const lado = emPe
-    ? Math.max(
-        fracao(largura, PROPORCAO.fotoMinima),
-        Math.min(tetoDaFoto, disponivel - alturaColuna - aposFoto),
-      )
-    : ladoDeitado
-
-  /*
-   * A pilha é centrada no espaço que sobrou, e não colada no topo: nome de uma
-   * linha e nome de três ficam ambos equilibrados entre a assinatura e o
-   * rodapé, em vez de deixarem um buraco embaixo.
-   */
-  const alturaPilha = emPe ? lado + aposFoto + alturaColuna : Math.max(lado, alturaColuna)
-  const pilhaTopo = conteudoTopo + Math.max(0, (disponivel - alturaPilha) / 2)
-
-  const fotoY = emPe ? pilhaTopo : pilhaTopo + Math.max(0, (alturaColuna - lado) / 2)
-  const colunaTopo = emPe
-    ? pilhaTopo + lado + fracao(largura, VAO.aposFoto)
-    : pilhaTopo + Math.max(0, (lado - alturaColuna) / 2)
+  const vao = {
+    largura,
+    margem,
+    util,
+    topo: marca.fim + fracao(largura, VAO.aposCabecalho),
+    fim: rodapeTopo - fracao(largura, VAO.antesRodape),
+  }
+  const arrumacao = emPe ? empilhar(medir, dados, vao) : deitar(medir, dados, vao)
 
   const blocoNome = bloco(
     medir,
-    nome.linhas.map((conteudo) => [{ conteudo, cor: COR.tinta }]),
-    colunaX,
-    colunaTopo,
-    nome.estilo,
+    arrumacao.nome.linhas.map((conteudo) => [{ conteudo, cor: COR.tinta }]),
+    arrumacao.colunaX,
+    arrumacao.colunaTopo,
+    arrumacao.nome.estilo,
     ENTRELINHA_NOME,
   )
   const blocoLugar = lugar(
     medir,
     dados,
-    colunaX,
+    arrumacao.colunaX,
     blocoNome.fim + fracao(largura, VAO.aposNome),
     largura,
   )
@@ -416,7 +491,7 @@ export function desenharCartao(
   ${dados.fontesEmbutidas ? `<defs><style>${dados.fontesEmbutidas}</style></defs>` : ''}
   <rect width="${largura}" height="${altura}" fill="${COR.fundo}"/>
   ${marca.svg}
-  ${foto(medir, dados, margem, fotoY, lado)}
+  ${foto(medir, dados, margem, arrumacao.fotoY, arrumacao.lado)}
   ${blocoNome.svg}
   ${blocoLugar.svg}
   ${rodape}

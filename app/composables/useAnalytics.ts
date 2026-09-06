@@ -86,7 +86,7 @@ export function useAnalytics() {
   }
 
   /*
-   * O QR vai junto porque é a única escolha que a arte oferece, e a resposta
+   * O QR vai junto porque é a única escolha que o Cartão oferece, e a resposta
    * decide se vale o trabalho de mantê-la: se quase ninguém liga, o controle
    * some; se quase todo mundo liga, ele nasce ligado.
    */

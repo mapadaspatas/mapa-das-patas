@@ -197,16 +197,21 @@ export const strings = {
     share: 'Compartilhar',
     shareText: (name: string) => `${name} precisa de ajuda. Veja como doar com segurança:`,
     shareLinkCopied: 'Link copiado!',
+    /*
+     * "Cartão" é como o projeto chama esta peça, mas fica fora do texto da
+     * tela: numa página cheia de PIX e chave de doação, "cartão" seria lido
+     * como cartão de crédito. Aqui ele é dito pelo que faz.
+     */
     promote: 'Divulgar',
-    promoteTitle: 'Arte para stories',
+    promoteTitle: 'Divulgar nos stories',
     promoteDescription:
-      'Uma imagem vertical com o nome, a cidade e o endereço desta página, montada aqui no seu navegador. O endereço vai junto para quem vir o story conferir a chave e a fonte atualizadas, em vez de acreditar na imagem.',
+      'Um story pronto com o nome, a cidade e o endereço desta página, montado aqui no seu navegador. O endereço vai junto para quem vir conferir a chave e a fonte na origem, sempre atualizadas, em vez de confiar num print.',
     promoteWithQr: 'Incluir o QR Code do PIX',
     promoteWithQrHelp: 'O mesmo código que aparece na página, montado a partir da chave publicada aqui.',
-    promoteGenerating: 'Montando a arte…',
-    promoteSave: 'Salvar imagem',
+    promoteGenerating: 'Montando…',
+    promoteSave: 'Salvar',
     promoteShare: 'Compartilhar',
-    promoteFailed: 'Não deu para montar a arte. Tente de novo.',
+    promoteFailed: 'Não deu para montar. Tente de novo.',
     promoteFileName: (slug: string) => `mapa-das-patas-${slug}.png`,
   },
   badge: {

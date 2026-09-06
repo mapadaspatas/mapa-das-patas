@@ -97,3 +97,21 @@ export function pixBrCodeOf(donation: Donation, name: string, city: string): str
   const key = pixKeyOf(donation)
   return key ? pixBrCode({ key, name, city }) : null
 }
+
+/**
+ * O BR Code de uma Iniciativa: o primeiro entre as doações dela que tem chave
+ * publicada. A maioria só tem `pix-na-fonte` e não tem nenhum, e é por isso que
+ * quem chama recebe `null` em vez de uma lista vazia — não ter QR a oferecer é
+ * o caso comum, não uma exceção.
+ */
+export function initiativeBrCode(
+  donations: Donation[] | undefined,
+  name: string,
+  city: string,
+): string | null {
+  for (const donation of donations ?? []) {
+    const code = pixBrCodeOf(donation, name, city)
+    if (code) return code
+  }
+  return null
+}

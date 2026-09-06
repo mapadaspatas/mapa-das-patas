@@ -2,7 +2,7 @@
  * Gera o Cartão de uma Iniciativa no navegador de quem vai divulgar, a partir
  * do mesmo desenho que o build usa (`app/utils/cartao.ts`).
  *
- * É aqui, e não no build, porque a arte de stories tem variação (com e sem QR)
+ * É aqui, e não no build, porque o vertical de stories tem variação (com e sem QR)
  * e é pedida por uma pessoa de cada vez: gerar as duas de cada Iniciativa com
  * CNPJ a cada publicação dobraria o trabalho do build para uma minoria delas.
  *
@@ -14,12 +14,7 @@
  * próprio: medir na variável que o site carrega e desenhar na estática daria
  * um layout ajustado para uma métrica que o resultado não tem.
  */
-import {
-  type DadosDoCartao,
-  desenharCartao,
-  type Enquadramento,
-  ENQUADRAMENTOS,
-} from './cartao.ts'
+import { type DadosDoCartao, desenharCartao, ENQUADRAMENTOS } from './cartao.ts'
 import { FAMILIA, type Estilo, type Medir } from './desenho.ts'
 
 /** As mesmas instâncias estáticas que o resvg usa no build. */
@@ -36,19 +31,18 @@ const ARQUIVOS = [
  */
 const medicao = (familia: string) => `Medida do Cartão ${familia}`
 
-export interface PedidoDeCartao {
-  nome: string
-  cidade: string
-  estado: string
-  /** Endereço da página, como se lê, sem esquema. */
-  endereco: string
-  verificado?: boolean
+/**
+ * O que a página pede, que é o que o desenho recebe menos o que só existe
+ * depois de buscar arquivo: a Imagem chega como caminho e vira data URI, o BR
+ * Code chega como texto e vira QR, e as fontes não são assunto de quem pede.
+ */
+export type PedidoDeCartao = Omit<DadosDoCartao, 'imagem' | 'qr' | 'fontesEmbutidas'> & {
   /** Caminho da Imagem no site (`/imagens/iniciativas/<slug>.webp`), se houver. */
   imagem?: string
   /**
    * BR Code da doação, quando a pessoa pediu o QR. Vem montado pela página, do
    * mesmo `pixBrCodeOf()` que desenha o QR da tela: a chave não sai daqui para
-   * serviço nenhum, e o código da arte é o mesmo que a página mostra.
+   * serviço nenhum, e o código do Cartão é o mesmo que a página mostra.
    */
   brCode?: string
 }
@@ -152,11 +146,13 @@ async function rasterizar(svg: string, largura: number, altura: number) {
   }
 }
 
-/** O Cartão pronto como PNG, para salvar ou compartilhar. */
-export async function gerarCartao(
-  pedido: PedidoDeCartao,
-  enquadramento: Enquadramento = 'stories',
-): Promise<Blob> {
+/**
+ * O Cartão vertical pronto como PNG, para salvar ou compartilhar. Só o
+ * vertical: o card de link nasce no build, onde ele é o `og:image` de uma
+ * página, e não faz sentido pedido por quem já está lendo essa página.
+ */
+export async function gerarCartao(pedido: PedidoDeCartao): Promise<Blob> {
+  const { brCode, ...comuns } = pedido
   const { renderSVG } = await import('uqr')
   const [fontesEmbutidas, imagem] = await Promise.all([
     carregarFontes(),
@@ -164,17 +160,13 @@ export async function gerarCartao(
   ])
 
   const dados: DadosDoCartao = {
-    nome: pedido.nome,
-    cidade: pedido.cidade,
-    estado: pedido.estado,
-    endereco: pedido.endereco,
-    verificado: pedido.verificado,
+    ...comuns,
     imagem,
     // Sem borda: o respiro do código é o do prato branco que o desenho põe.
-    qr: pedido.brCode ? renderSVG(pedido.brCode, { border: 0, pixelSize: 8, ecc: 'M' }) : undefined,
+    qr: brCode ? renderSVG(brCode, { border: 0, pixelSize: 8, ecc: 'M' }) : undefined,
     fontesEmbutidas,
   }
 
-  const { largura, altura } = ENQUADRAMENTOS[enquadramento]
-  return await rasterizar(desenharCartao(dados, enquadramento, medirComCanvas), largura, altura)
+  const { largura, altura } = ENQUADRAMENTOS.stories
+  return await rasterizar(desenharCartao(dados, 'stories', medirComCanvas), largura, altura)
 }
