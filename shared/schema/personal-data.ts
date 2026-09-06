@@ -85,7 +85,13 @@ export const personalKeyInTextMessage =
  * A mesma recusa no campo de chave. Diz o que acontece com a doação, e não que
  * controle usar: o mesmo texto sai no formulário, na resposta da Function e na
  * validação de CI, e quem abre PR direto no YAML não tem tela nenhuma na frente.
+ *
+ * O caminho no fim é a única coisa que a mensagem manda alguém ler, e por isso
+ * aponta uma página publicada: /privacidade enuncia a regra inteira, o
+ * formulário já linka para ela, e quem só clonou o repositório também a
+ * alcança. Documento interno não serve: não vai junto no clone nem tem rota.
  */
 export const personalKeyInKeyFieldMessage =
   'Chave de pessoa não é publicada aqui: só publicamos chave de CNPJ. '
-  + 'A doação entra sem a chave, apontando para o link do post onde ela aparece.'
+  + 'A doação entra sem a chave, apontando para o link do post onde ela aparece '
+  + '(política em /privacidade).'

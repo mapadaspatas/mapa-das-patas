@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { cnpjChars, formatCnpj, isCnpjMaskable } from '~~/shared/cnpj'
+import { canonicalSource } from '~~/shared/donation-source'
 import { instagramHandle } from '~~/shared/instagram'
 import {
   citiesOf,
@@ -333,6 +334,16 @@ function normalizeSocialField(field: keyof typeof form.social) {
   form.social.instagram = instagramHandle(form.social.instagram) ?? form.social.instagram
 }
 
+/**
+ * O link da Fonte também chega colado do app, com o rastreio junto (ver
+ * shared/donation-source.ts). Limpamos ao sair do campo, como no campo do
+ * Instagram: o valor que fica visível é o mesmo que vai ser publicado, e não
+ * uma versão encurtada em silêncio depois do envio.
+ */
+function normalizeSource(row: DonationRow) {
+  row.source = canonicalSource(row.source)
+}
+
 /** Monta o objeto no formato de dados publicado (campos em pt-BR). */
 function buildInitiative() {
   // O blur cobre o caminho normal; aqui é a rede de segurança do envio que
@@ -360,7 +371,7 @@ function buildInitiative() {
             tipo: row.type,
             ...(usesDonationKey(row.type) ? { chave: row.key.trim() } : {}),
             ...(usesDonationUrl(row.type) ? { url: row.url.trim() } : {}),
-            fonte: row.source.trim(),
+            fonte: canonicalSource(row.source),
           })),
         }
       : {}),
@@ -725,7 +736,12 @@ async function startOver() {
               :error="errorFor(`doacoes.${i}.fonte`)"
               :help="sourceHelp(row)"
             >
-              <UInput v-model="row.source" placeholder="https://instagram.com/p/…" class="w-full" />
+              <UInput
+                v-model="row.source"
+                placeholder="https://instagram.com/p/…"
+                class="w-full"
+                @blur="normalizeSource(row)"
+              />
             </UFormField>
           </div>
 
