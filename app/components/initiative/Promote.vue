@@ -43,10 +43,19 @@ const address = computed(() => props.url.replace(/^https?:\/\//, ''))
 
 const fileName = computed(() => strings.detail.promoteFileName(props.slug))
 
+/**
+ * Conta os pedidos para o último ganhar. Ligar e desligar o QR depressa põe
+ * dois desenhos no ar ao mesmo tempo, e sem isto quem terminasse por último
+ * mandaria — o controle diria "com QR" e o arquivo salvo sairia sem, que é
+ * exatamente o Cartão errado que ninguém confere antes de postar.
+ */
+let pedido = 0
+
 async function draw() {
+  const atual = ++pedido
   drawing.value = true
   try {
-    card.value = await gerarCartao({
+    const feito = await gerarCartao({
       nome: props.name,
       cidade: props.city,
       estado: props.state,
@@ -55,14 +64,17 @@ async function draw() {
       imagem: props.image,
       brCode: withQrCode.value ? (brCode.value ?? undefined) : undefined,
     })
+    if (atual !== pedido) return
+    card.value = feito
     if (preview.value) URL.revokeObjectURL(preview.value)
-    preview.value = URL.createObjectURL(card.value)
+    preview.value = URL.createObjectURL(feito)
   }
   catch {
+    if (atual !== pedido) return
     toast.add({ title: strings.detail.promoteFailed, color: 'error', icon: 'i-lucide-circle-alert' })
   }
   finally {
-    drawing.value = false
+    if (atual === pedido) drawing.value = false
   }
 }
 

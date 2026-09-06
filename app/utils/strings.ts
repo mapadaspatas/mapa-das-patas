@@ -205,7 +205,7 @@ export const strings = {
     promote: 'Divulgar',
     promoteTitle: 'Divulgar nos stories',
     promoteDescription:
-      'Um story pronto com o nome, a cidade e o endereço desta página, montado aqui no seu navegador. O endereço vai junto para quem vir conferir a chave e a fonte na origem, sempre atualizadas, em vez de confiar num print.',
+      'Um story pronto com o nome, a cidade e o endereço desta página, montado aqui no seu navegador. O endereço vai junto para quem receber conferir a chave e a fonte na origem, sempre atualizadas, em vez de confiar num print.',
     promoteWithQr: 'Incluir o QR Code do PIX',
     promoteWithQrHelp: 'O mesmo código que aparece na página, montado a partir da chave publicada aqui.',
     promoteGenerating: 'Montando…',
