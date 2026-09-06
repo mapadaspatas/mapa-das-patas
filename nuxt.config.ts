@@ -26,10 +26,13 @@ export default defineNuxtConfig({
     public: {
       /*
        * Base absoluta do site, usada por og:image e pelo botão de compartilhar
-       * (card de rede social não aceita caminho relativo). O deploy sobrescreve
-       * com NUXT_PUBLIC_SITE_URL, inclusive nas previews do Cloudflare Pages.
+       * (card de rede social não aceita caminho relativo). O padrão é o domínio
+       * próprio, e não o endereço do Pages: tudo o que sai daqui vai parar na
+       * conversa de outra pessoa, e lá o endereço do ambiente que gerou não diz
+       * nada. O deploy sobrescreve com NUXT_PUBLIC_SITE_URL, inclusive nas
+       * previews do Cloudflare Pages.
        */
-      siteUrl: 'https://mapadaspatas.pages.dev',
+      siteUrl: 'https://mapadaspatas.com.br',
       umamiWebsiteId: '',
       umamiHostUrl: 'https://cloud.umami.is',
       umamiPublicUrl: '',
@@ -90,6 +93,8 @@ export default defineNuxtConfig({
         'lucide:image-plus',
         'lucide:package',
         'lucide:share-2',
+        'lucide:megaphone',
+        'lucide:download',
         'lucide:mail',
         'simple-icons:github',
         'simple-icons:instagram',

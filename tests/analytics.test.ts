@@ -20,6 +20,7 @@ describe('useAnalytics', () => {
       analytics.trackOpenCampaign('ong-exemplo', 'https://apoia.se/ong', 'Apoia.se')
       analytics.trackOpenSocial('ong-exemplo', 'Instagram')
       analytics.trackShare('ong-exemplo')
+      analytics.trackPromote('ong-exemplo', true)
       analytics.trackSearch({ search: 'gatos', state: 'SP' })
       analytics.trackCadastroSuccess('novo')
     }).not.toThrow()
@@ -82,6 +83,18 @@ describe('useAnalytics', () => {
     analytics.trackShare('ong-exemplo')
     expect(trackMock).toHaveBeenCalledWith('compartilhar_iniciativa', {
       iniciativa: 'ong-exemplo',
+    })
+
+    analytics.trackPromote('ong-exemplo', true)
+    expect(trackMock).toHaveBeenCalledWith('divulgar_iniciativa', {
+      iniciativa: 'ong-exemplo',
+      qrcode: true,
+    })
+
+    analytics.trackPromote('ong-exemplo', false)
+    expect(trackMock).toHaveBeenCalledWith('divulgar_iniciativa', {
+      iniciativa: 'ong-exemplo',
+      qrcode: false,
     })
 
     analytics.trackSearch({ search: 'gatos', state: 'SP', city: '' })

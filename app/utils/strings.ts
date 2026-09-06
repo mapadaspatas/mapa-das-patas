@@ -57,6 +57,10 @@ export const strings = {
   card: {
     source: 'fonte',
   },
+  shareCard: {
+    needs: 'Precisando agora',
+    social: 'Redes',
+  },
   register: {
     title: 'Cadastrar iniciativa',
     subtitle:
@@ -204,6 +208,17 @@ export const strings = {
     share: 'Compartilhar',
     shareText: (name: string) => `${name} precisa de ajuda. Veja como doar com segurança:`,
     shareLinkCopied: 'Link copiado!',
+    promote: 'Divulgar',
+    promoteTitle: 'Divulgar nos stories',
+    promoteDescription:
+      'Um story pronto com o que esta página diz da iniciativa: nome, cidade, descrição, o que ela está precisando agora e as redes dela. É montado aqui no seu navegador, e o endereço da página vai junto para quem receber conferir a chave e a fonte na origem, sempre atualizadas, em vez de confiar num print.',
+    promoteWithQr: 'Incluir o QR Code do PIX',
+    promoteWithQrHelp: 'O mesmo código que aparece na página, montado a partir da chave publicada aqui.',
+    promoteGenerating: 'Montando…',
+    promoteSave: 'Salvar',
+    promoteShare: 'Compartilhar',
+    promoteFailed: 'Não deu para montar. Tente de novo.',
+    promoteFileName: (slug: string) => `mapa-das-patas-${slug}.png`,
   },
   badge: {
     verified: 'Verificada',

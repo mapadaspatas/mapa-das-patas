@@ -13,22 +13,28 @@
  * cópia em `strings.ts`, rodar de novo e não reposicionar nada à mão.
  *
  * As fontes precisam chegar ao resvg como arquivo — ele não fala com o Google.
- * A API css2 devolve TTF, e não woff2, quando quem pede não é navegador (o
- * caso do fetch do Node); os arquivos ficam em `.data/fontes/`, fora do git.
+ * Estão versionadas em `public/fontes/`, com a licença ao lado, então o script
+ * roda sem rede.
  *
  *   node scripts/build-social.ts
  */
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
-import { Resvg } from '@resvg/resvg-js'
-import { logoPad, logoPadStroke, logoToes, logoViewBox } from '../app/utils/logo.ts'
+import { mkdirSync, writeFileSync } from 'node:fs'
+import {
+  ajustar,
+  arredondar,
+  bloco,
+  COR,
+  dimensoes,
+  ESPACEJAMENTO_DISPLAY,
+  FAMILIA,
+  pata,
+  texto,
+  type Trecho,
+} from '../app/utils/desenho.ts'
+import { logoViewBox } from '../app/utils/logo.ts'
 import { strings } from '../app/utils/strings.ts'
 import { ufShapes, ufViewBox } from '../app/utils/uf-map.ts'
-
-/** Largura e altura de um `viewBox`, para nenhuma escala aqui ser chutada. */
-function dimensoes(viewBox: string) {
-  const [, , largura, altura] = viewBox.split(/\s+/).map(Number) as [number, number, number, number]
-  return { largura, altura }
-}
+import { medirComResvg as medir, medirDesenhoComResvg, rasterizarComResvg } from './resvg.ts'
 
 const LOGO = dimensoes(logoViewBox)
 const UF = dimensoes(ufViewBox)
@@ -59,9 +65,6 @@ const PATA = 96
 const NOME = (PATA * 20) / 24
 const INTERVALO = (PATA * 8) / 24
 
-/** Espacejamento dos títulos, o mesmo de `.font-display` em `main.css`. */
-const ESPACEJAMENTO_DISPLAY = -0.025
-
 /**
  * Mapa de UFs no canto inferior direito. O tamanho sai do espaço que o texto
  * deixou; `alturaMinima` é o ponto em que ele deixaria de ser reconhecível
@@ -85,174 +88,7 @@ const PILAR = { tamanho: 28, passo: 62, ponto: 7, recuo: 34 }
  */
 const ENDERECO = 'mapadaspatas.com.br'
 
-const COR = {
-  /** urucum-500: o `--ui-primary` do tema claro, a pata do cabeçalho. */
-  marca: '#E2551F',
-  /** urucum-600: o tile do favicon, para a foto de perfil falar com o ícone. */
-  marcaTile: '#D6410E',
-  /** urucum-700: o endereço, que precisa de contraste de texto e não de marca. */
-  endereco: '#A82F07',
-  /** urucum-200: o mapa, presente sem competir com o texto. */
-  mapa: '#FACDB6',
-  /**
-   * mato-600 nos pilares: o verde é o da confiança em `main.css`, mas um degrau
-   * abaixo do `text-secondary` do site (o 500). No papel do cartão o 500 dá
-   * 3.6:1, e o rótulo é lido pequeno na timeline; o 600 dá 4.6:1.
-   */
-  confianca: '#1C7A4A',
-  /** urucum-50: o papel. */
-  fundo: '#FEF5F0',
-  /** stone-900 e stone-600: `text-highlighted` e `text-muted` no tema claro. */
-  tinta: '#1C1917',
-  tintaFraca: '#57534E',
-  /** stone-200: `border-muted`, o filete que fecha o texto. */
-  filete: '#E7E5E4',
-  branco: '#FFFFFF',
-}
-
-const DISPLAY = 'Bricolage Grotesque'
-const TEXTO = 'Instrument Sans'
-const DIR_FONTES = '.data/fontes'
 const DIR_SAIDA = 'public/imagens/redes'
-
-// ---------------------------------------------------------------- fontes
-
-/**
- * Baixa a instância estática do peso pedido. Estática, e não o arquivo
- * variável: o resvg não aplica eixos de variação, então o variável chegaria
- * sempre na instância padrão e o título sairia em regular.
- */
-async function baixarFonte(familia: string, peso: number) {
-  const arquivo = `${DIR_FONTES}/${familia.toLowerCase().replace(/ /g, '-')}-${peso}.ttf`
-  if (existsSync(arquivo)) return arquivo
-
-  const css = `https://fonts.googleapis.com/css2?family=${familia.replace(/ /g, '+')}:wght@${peso}`
-  const resposta = await fetch(css)
-  if (!resposta.ok) throw new Error(`Google Fonts respondeu ${resposta.status} para ${familia} ${peso}`)
-  const url = (await resposta.text()).match(/url\((https:[^)]+\.ttf)\)/)?.[1]
-  if (!url) throw new Error(`sem TTF para ${familia} ${peso}: a API css2 devolveu woff2`)
-
-  const ttf = await fetch(url)
-  if (!ttf.ok) throw new Error(`download de ${familia} ${peso} respondeu ${ttf.status}`)
-  mkdirSync(DIR_FONTES, { recursive: true })
-  writeFileSync(arquivo, Buffer.from(await ttf.arrayBuffer()))
-  return arquivo
-}
-
-const fontFiles = [
-  await baixarFonte(DISPLAY, 700),
-  await baixarFonte(TEXTO, 400),
-  await baixarFonte(TEXTO, 600),
-]
-/*
- * `loadSystemFonts: false` mantém o resultado igual em qualquer máquina: com
- * as fontes do sistema carregadas, um Windows sem Instrument Sans renderizaria
- * Arial sem avisar e o cartão sairia "quase certo".
- */
-const font = { loadSystemFonts: false, fontFiles }
-
-// ---------------------------------------------------------------- medição
-
-type Estilo = { familia: string, peso: number, tamanho: number, espacejamento?: number }
-/** Pedaço de linha com cor própria: é o que permite pintar só o fim do título. */
-type Trecho = { conteudo: string, cor: string }
-
-function escapar(texto: string) {
-  return texto.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-}
-
-/**
- * Uma linha, em um ou mais trechos. O primeiro leva a cor no próprio `<text>`
- * e os seguintes viram `<tspan>`, que continua na mesma linha de onde o
- * anterior parou — o equivalente ao `<span class="text-primary">` da home.
- */
-function texto(trechos: Trecho[], x: number, base: number, estilo: Estilo) {
-  const [primeiro, ...resto] = trechos as [Trecho, ...Trecho[]]
-  const espacejamento = (estilo.espacejamento ?? 0) * estilo.tamanho
-  return `<text x="${arredondar(x)}" y="${arredondar(base)}" fill="${primeiro.cor}"`
-    + ` font-family="${estilo.familia}" font-weight="${estilo.peso}" font-size="${estilo.tamanho}"`
-    + (espacejamento ? ` letter-spacing="${arredondar(espacejamento)}"` : '')
-    + `>${escapar(primeiro.conteudo)}`
-    + resto.filter((t) => t.conteudo).map((t) => `<tspan fill="${t.cor}">${escapar(t.conteudo)}</tspan>`).join('')
-    + `</text>`
-}
-
-/**
- * Caixa de tinta de um trecho, em pixels, relativa à linha de base. É o resvg
- * que mede: ele já converte o texto em contornos para desenhar, então a conta
- * é a mesma que vai para o PNG — inclusive com as acentuações do português,
- * que sobem acima da altura de caixa alta.
- */
-function medir(conteudo: string, estilo: Estilo) {
-  if (!conteudo.trim()) return { largura: 0, topo: 0, base: 0 }
-  const base = 1000
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="8000" height="2000">`
-    + texto([{ conteudo, cor: '#000' }], 0, base, estilo)
-    + `</svg>`
-  const caixa = new Resvg(svg, { font }).getBBox()
-  if (!caixa) throw new Error(`o resvg não mediu "${conteudo}"`)
-  return { largura: caixa.width, topo: caixa.y - base, base: caixa.y + caixa.height - base }
-}
-
-/**
- * Caixa de tinta de um trecho de SVG qualquer, nas unidades dele. `getBBox`, e
- * não `innerBBox`: este arredonda para o pixel inteiro, e a caixa da pata tem
- * 24 unidades de lado — um pixel ali é 4% do desenho. O traço entra na conta.
- */
-function medirDesenho(conteudo: string, viewBox: string, lado: number) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="${lado}" height="${lado}">${conteudo}</svg>`
-  const caixa = new Resvg(svg, { font }).getBBox()
-  if (!caixa) throw new Error('o resvg não mediu o desenho')
-  return caixa
-}
-
-/** Quebra gulosa: só cabe na linha o que a medição disser que cabe. */
-function quebrar(conteudo: string, largura: number, estilo: Estilo) {
-  const linhas: string[] = []
-  let atual = ''
-  for (const palavra of conteudo.split(/\s+/).filter(Boolean)) {
-    const tentativa = atual ? `${atual} ${palavra}` : palavra
-    if (atual && medir(tentativa, estilo).largura > largura) {
-      linhas.push(atual)
-      atual = palavra
-    }
-    else {
-      atual = tentativa
-    }
-  }
-  if (atual) linhas.push(atual)
-  return linhas
-}
-
-/**
- * Maior corpo em que o texto cabe no espaço reservado. O cartão inteiro está
- * amarrado a `strings.ts`: sem isto, uma frase mais longa lá estouraria a
- * caixa aqui, e a imagem sairia com texto por cima do mapa.
- */
-function ajustar(conteudo: string, opcoes: { largura: number, linhas: number, teto: number } & Omit<Estilo, 'tamanho'>) {
-  const { largura, linhas: maximo, teto, ...resto } = opcoes
-  for (let tamanho = teto; tamanho > 8; tamanho -= 1) {
-    const estilo = { ...resto, tamanho }
-    const linhas = quebrar(conteudo, largura, estilo)
-    if (linhas.length <= maximo) return { estilo, linhas }
-  }
-  throw new Error(`"${conteudo.slice(0, 40)}…" não cabe em ${maximo} linhas de ${largura}px`)
-}
-
-/**
- * Desenha as linhas de um bloco a partir do topo da tinta da primeira: em SVG
- * se posiciona a linha de base, e alinhar pelo topo é o que faz o bloco
- * encostar onde o layout pediu, sem depender do corpo escolhido.
- */
-function bloco(linhas: Trecho[][], x: number, topo: number, estilo: Estilo, entrelinha: number) {
-  const plana = (linha: Trecho[]) => linha.map((t) => t.conteudo).join('')
-  const base = topo - medir(plana(linhas[0]!), estilo).topo
-  const passo = estilo.tamanho * entrelinha
-  return {
-    svg: linhas.map((linha, i) => texto(linha, x, base + i * passo, estilo)).join('\n  '),
-    fim: base + (linhas.length - 1) * passo + medir(plana(linhas.at(-1)!), estilo).base,
-  }
-}
 
 /**
  * Pinta o fim do texto com a cor da marca, atravessando a quebra de linha:
@@ -273,17 +109,7 @@ function destacarFim(linhas: string[], destaque: string, tinta: string, marca: s
   })
 }
 
-function arredondar(valor: number) {
-  return Math.round(valor * 100) / 100
-}
-
 // ---------------------------------------------------------------- desenhos
-
-/** A marca, nas unidades de `logoViewBox`: preenchimento e traço da mesma cor. */
-function pata(cor: string) {
-  return `<path d="${logoPad}" fill="${cor}" stroke="${cor}" stroke-width="${logoPadStroke}" stroke-linejoin="round"/>`
-    + logoToes.map((dedo) => `<circle cx="${dedo.cx}" cy="${dedo.cy}" r="${dedo.r}" fill="${cor}"/>`).join('')
-}
 
 /** Os 27 estados em chapado, sem sigla e sem rampa: aqui o mapa é figura, não dado. */
 function mapa() {
@@ -300,7 +126,7 @@ function mapa() {
  */
 function perfil() {
   const desenho = pata(COR.branco)
-  const caixa = medirDesenho(desenho, logoViewBox, LOGO.largura)
+  const caixa = medirDesenhoComResvg(desenho, logoViewBox, LOGO.largura)
   const escala = (LADO * OCUPACAO_PERFIL) / Math.max(caixa.width, caixa.height)
   const x = LADO / 2 - (caixa.x + caixa.width / 2) * escala
   const y = LADO / 2 - (caixa.y + caixa.height / 2) * escala
@@ -322,7 +148,7 @@ function cartao(altura: number) {
 
   // Assinatura: pata à esquerda, nome com a caixa alta centrada na altura dela.
   const escalaPata = PATA / LOGO.largura
-  const estiloNome = { familia: DISPLAY, peso: 700, tamanho: NOME, espacejamento: ESPACEJAMENTO_DISPLAY }
+  const estiloNome = { familia: FAMILIA.display, peso: 700, tamanho: NOME, espacejamento: ESPACEJAMENTO_DISPLAY }
   const caixaNome = medir(strings.siteName, estiloNome)
   if (MARGEM + PATA + INTERVALO + caixaNome.largura > LADO - MARGEM) {
     throw new Error(`a assinatura não cabe na largura do cartão: encolhe PATA (hoje ${PATA}px)`)
@@ -332,15 +158,16 @@ function cartao(altura: number) {
 
   // A tese da home, com o fim na cor da marca (`titleAccent` em `index.vue`).
   const destaque = strings.home.title.endsWith(strings.home.titleAccent) ? strings.home.titleAccent : ''
-  const titulo = ajustar(strings.home.title, {
+  const titulo = ajustar(medir, strings.home.title, {
     largura: larguraTexto,
     linhas: 2,
     teto: 88,
-    familia: DISPLAY,
+    familia: FAMILIA.display,
     peso: 700,
     espacejamento: ESPACEJAMENTO_DISPLAY,
   })
   const blocoTitulo = bloco(
+    medir,
     destacarFim(titulo.linhas, destaque, COR.tinta, COR.marca),
     MARGEM,
     MARGEM + PATA + 56,
@@ -348,14 +175,15 @@ function cartao(altura: number) {
     1.06,
   )
 
-  const subtitulo = ajustar(strings.home.subtitle, {
+  const subtitulo = ajustar(medir, strings.home.subtitle, {
     largura: larguraTexto,
     linhas: 3,
     teto: 34,
-    familia: TEXTO,
+    familia: FAMILIA.texto,
     peso: 400,
   })
   const blocoSubtitulo = bloco(
+    medir,
     subtitulo.linhas.map((conteudo) => [{ conteudo, cor: COR.tintaFraca }]),
     MARGEM,
     blocoTitulo.fim + 44,
@@ -378,8 +206,8 @@ function cartao(altura: number) {
     ${mapa()}
   </g>`
 
-  const estiloPerfil = { familia: TEXTO, peso: 400, tamanho: 30 }
-  const estiloEndereco = { familia: TEXTO, peso: 600, tamanho: 34 }
+  const estiloPerfil = { familia: FAMILIA.texto, peso: 400, tamanho: 30 }
+  const estiloEndereco = { familia: FAMILIA.texto, peso: 600, tamanho: 34 }
   const basePerfil = altura - MARGEM - medir(strings.contact.instagramHandle, estiloPerfil).base
   const baseEndereco = basePerfil - 48
   const rodape = texto([{ conteudo: ENDERECO, cor: COR.endereco }], MARGEM, baseEndereco, estiloEndereco)
@@ -398,7 +226,7 @@ function cartao(altura: number) {
    * PÚBLICO descer o que o acento sobe, e as linhas de base sairiam tortas.
    * O bloco fica centrado no vão entre o filete e o endereço.
    */
-  const estiloPilar = { familia: TEXTO, peso: 600, tamanho: PILAR.tamanho, espacejamento: 0.12 }
+  const estiloPilar = { familia: FAMILIA.texto, peso: 600, tamanho: PILAR.tamanho, espacejamento: 0.12 }
   const rotulos = [strings.home.trust.source, strings.home.trust.history, strings.home.trust.moderation]
     .map((pilar) => pilar.title.toLocaleUpperCase('pt-BR'))
   const caixasPilar = rotulos.map((rotulo) => medir(rotulo, estiloPilar))
@@ -464,7 +292,7 @@ const arquivos: [string, string][] = [
 ]
 
 for (const [nome, svg] of arquivos) {
-  const png = new Resvg(svg, { font }).render().asPng()
+  const png = rasterizarComResvg(svg)
   writeFileSync(`${DIR_SAIDA}/${nome}`, png)
   console.log(`${DIR_SAIDA}/${nome} (${(png.length / 1024).toFixed(1)} KB)`)
 }

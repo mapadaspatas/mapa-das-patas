@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { crc16, pixBrCode, pixBrCodeOf, pixKeyOf } from '../app/utils/pix'
+import { crc16, initiativeBrCode, pixBrCode, pixBrCodeOf, pixKeyOf } from '../app/utils/pix'
 
 /**
  * O BR Code é a costura entre a chave publicada e o app do banco do doador:
@@ -92,5 +92,26 @@ describe('pixBrCodeOf', () => {
     // pix-na-fonte, sem chave na página e, portanto, sem QR para montar.
     expect(pixBrCodeOf({ tipo: 'pix-na-fonte', fonte: 'https://x.com/a' }, 'Abrigo', 'Curitiba'))
       .toBeNull()
+  })
+})
+
+describe('initiativeBrCode', () => {
+  const fonte = 'https://instagram.com/abrigo'
+  const cnpj = { tipo: 'pix-cnpj', chave: '12.345.678/0001-90', fonte } as const
+  const naFonte = { tipo: 'pix-na-fonte', fonte } as const
+  const vaquinha = { tipo: 'vaquinha', url: 'https://v.com/a', fonte } as const
+
+  it('acha a chave publicada mesmo depois de doações que não têm nenhuma', () => {
+    expect(initiativeBrCode([naFonte, vaquinha, cnpj], 'Abrigo Esperança', 'Curitiba'))
+      .toContain('011412345678000190')
+  })
+
+  it('não oferece nada quando nenhuma doação tem chave publicada', () => {
+    expect(initiativeBrCode([naFonte, vaquinha], 'Abrigo Esperança', 'Curitiba')).toBeNull()
+  })
+
+  it('trata Iniciativa sem doação nenhuma como Iniciativa sem QR', () => {
+    expect(initiativeBrCode(undefined, 'Abrigo Esperança', 'Curitiba')).toBeNull()
+    expect(initiativeBrCode([], 'Abrigo Esperança', 'Curitiba')).toBeNull()
   })
 })

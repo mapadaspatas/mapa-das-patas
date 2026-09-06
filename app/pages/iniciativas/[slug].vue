@@ -103,16 +103,32 @@ async function share() {
           {{ kindSentence(initiative.tipo, initiative.especies) }}
         </p>
       </div>
-      <UButton
-        class="self-start"
-        color="neutral"
-        variant="outline"
-        size="sm"
-        icon="i-lucide-share-2"
-        @click="share"
-      >
-        {{ strings.detail.share }}
-      </UButton>
+      <div class="flex shrink-0 gap-2 self-start">
+        <UButton
+          color="neutral"
+          variant="outline"
+          size="sm"
+          icon="i-lucide-share-2"
+          @click="share"
+        >
+          {{ strings.detail.share }}
+        </UButton>
+        <InitiativePromote
+          :slug="slug"
+          :name="initiative.nome"
+          :city="initiative.cidade"
+          :state="initiative.estado"
+          :verified="Boolean(verification)"
+          :image="initiative.imagem ?? undefined"
+          :url="pageUrl"
+          :description="initiative.descricao"
+          :type="initiative.tipo"
+          :species="initiative.especies ?? undefined"
+          :needs="initiative.necessidades ?? undefined"
+          :social="initiative.redes ?? undefined"
+          :donations="initiative.doacoes ?? undefined"
+        />
+      </div>
     </div>
 
     <p class="mt-6 max-w-prose text-lg/relaxed">{{ initiative.descricao }}</p>

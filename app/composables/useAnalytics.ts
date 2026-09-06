@@ -85,6 +85,18 @@ export function useAnalytics() {
     })
   }
 
+  /*
+   * O QR vai junto porque é a única escolha que o Cartão oferece, e a resposta
+   * decide se vale o trabalho de mantê-la: se quase ninguém liga, o controle
+   * some; se quase todo mundo liga, ele nasce ligado.
+   */
+  function trackPromote(slug: string, comQrCode: boolean) {
+    track('divulgar_iniciativa', {
+      iniciativa: slug,
+      qrcode: comQrCode,
+    })
+  }
+
   /**
    * O termo digitado vai inteiro, e não só contado. Um contador diria quantas
    * buscas houve; o que precisamos saber é qual cidade ficou sem cobertura e
@@ -117,6 +129,7 @@ export function useAnalytics() {
     trackOpenCampaign,
     trackOpenSocial,
     trackShare,
+    trackPromote,
     trackSearch,
     trackCadastroSuccess,
   }
