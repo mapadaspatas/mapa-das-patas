@@ -572,6 +572,7 @@ async function startOver() {
             {{ imageError || errorFor('imagem') }}
           </p>
           <p class="text-sm text-dimmed">{{ t.imageConsent }}</p>
+          <p class="text-sm text-dimmed">{{ t.imageProcessing }}</p>
         </section>
 
         <!-- Redes -->

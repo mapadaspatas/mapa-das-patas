@@ -78,7 +78,9 @@ export const strings = {
     needs: 'Necessidades atuais',
     imageSection: 'Foto da iniciativa',
     imageHelp:
-      'Opcional. Vale a foto de perfil do Instagram, o logo ou uma foto dos animais. Ela é recortada em quadrado e reduzida aqui no seu navegador antes do envio.',
+      'Opcional. Foto de perfil, logo ou foto dos animais. Não envie print de post ou de story.',
+    imageProcessing:
+      'Ela é recortada em quadrado e reduzida aqui no seu navegador antes do envio.',
     imageConsent:
       'Envie só imagem que a própria iniciativa publica ou autorizou. Ela fica pública no site e no repositório.',
     imageChoose: 'Escolher imagem',
