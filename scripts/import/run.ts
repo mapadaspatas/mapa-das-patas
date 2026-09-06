@@ -52,14 +52,22 @@ Regras aplicadas automaticamente: CNPJ publicado direto; toda chave de pessoa
 física (CPF, e-mail, telefone) virou \`pix-na-fonte\`; descrições geradas
 genericamente, a melhorar com a comunidade; tipo e espécies inferidos do nome.
 
-Nenhum item cita o valor de uma chave descartada: este arquivo é versionado no
-repositório público, e citá-lo republicaria a chave de pessoa física que a
-regra de dados pessoais mantém fora do site.
+Nenhum item cita o valor de uma chave descartada. O relatório fica fora do
+versionamento, mas bastaria copiar um trecho dele para um PR ou uma issue para
+republicar a chave de pessoa física que a regra de dados pessoais mantém fora
+do site.
 
 ${checklist.join('\n\n')}
 `
 
-writeFileSync(join(root, '.scratch', 'mapa-das-patas', 'conferencia-importacao.md'), report, 'utf8')
+/*
+ * `.data/` é a pasta de saída local do projeto, listada no `.gitignore`: o
+ * relatório nasce fora da árvore versionada em qualquer clone, sem depender de
+ * exclusão configurada à mão na máquina de quem roda.
+ */
+const reportDir = join(root, '.data')
+mkdirSync(reportDir, { recursive: true })
+writeFileSync(join(reportDir, 'conferencia-importacao.md'), report, 'utf8')
 
 console.log(`✔ ${results.length - errors} Iniciativa(s) importada(s), ${errors} erro(s).`)
 console.log(`  ${checklist.length} Iniciativa(s) com itens de conferência manual.`)

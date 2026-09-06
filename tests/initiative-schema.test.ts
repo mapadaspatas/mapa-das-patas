@@ -90,7 +90,7 @@ describe('cidade dentro da lista do IBGE', () => {
 })
 
 describe('enums fechados', () => {
-  it('aceita todos os tipos de Iniciativa da spec', () => {
+  it('aceita todos os tipos de Iniciativa do vocabulário', () => {
     for (const tipo of ['ong', 'associacao', 'protetor-independente', 'projeto-informal', 'abrigo-santuario']) {
       expect(initiativeSchema.safeParse({ ...validInitiative, tipo }).success).toBe(true)
     }
@@ -199,7 +199,7 @@ function withSocial(social: unknown) {
 }
 
 describe('redes sociais', () => {
-  it('aceita todas as redes da spec de uma vez', () => {
+  it('aceita todas as redes do schema de uma vez', () => {
     expect(
       withSocial({
         instagram: 'gatilhope',

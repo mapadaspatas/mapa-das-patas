@@ -19,7 +19,7 @@ import { expiryFromNow, mint, tokenLifetimeDays } from '../shared/confirmation/t
  * localhost colado numa DM não abre para ninguém. Para testar local, use o
  * token cru impresso no fim e monte a URL na mão.
  */
-const siteUrl = 'https://mapadaspatas.pages.dev'
+const siteUrl = 'https://mapadaspatas.com.br'
 
 // Roda fora do Nuxt, então o `.env` não vem carregado. Sem arquivo, segue com
 // o que já estiver no ambiente.
