@@ -1,6 +1,6 @@
 /**
- * Emite o link de confirmação de uma Iniciativa, para colar na mensagem que o
- * Moderador já manda hoje (ver `docs/mensagens-para-iniciativas.md`).
+ * Emite o link de confirmação de uma Iniciativa, para o Moderador colar na
+ * mensagem que manda pelo canal oficial que a página da Iniciativa publica.
  *
  * Uso: pnpm token <slug> <canal>
  *   pnpm token abrigo-amor-miau DM do Instagram oficial
