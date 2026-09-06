@@ -29,6 +29,7 @@ export function normalizeText(text: string): string {
     .normalize('NFD')
     // Escape explícito em vez da marca combinante literal: ela é invisível no
     // fonte, e um salvamento em encoding errado quebraria a busca sem aviso.
+    // O mesmo escape, pelo mesmo motivo, está em shared/slug.ts e app/utils/pix.ts.
     .replace(/[\u0300-\u036f]/g, '')
     /*
      * Apóstrofo, hífen e ponto somem dos dois lados da comparação, sem virar

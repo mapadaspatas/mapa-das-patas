@@ -10,7 +10,6 @@
 # Formato:
 # - slug: nome-da-iniciativa
 #   em: 2026-08-22
-#   pedido: oposicao   # o PR só apaga o arquivo e o histórico fica como está
-#                      # ou: eliminacao, que também reescreve o histórico Git
+#   pedido: oposicao   # ou: eliminacao
 
 removidos: []

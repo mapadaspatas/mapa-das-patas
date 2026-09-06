@@ -36,9 +36,20 @@ const initiatives = [
 
 /** Iniciativas em municípios do IBGE com apóstrofo, os que a busca precisa alcançar sem ele. */
 const apostrophed = [
-  { nome: 'Gatos de Rua', estado: 'SP', cidade: 'Santa Bárbara d\'Oeste', tipo: 'ong' },
+  { nome: 'Gatos do Oeste', estado: 'SP', cidade: 'Santa Bárbara d\'Oeste', tipo: 'ong' },
   { nome: 'Patas do Sul', estado: 'RS', cidade: 'Sant\'Ana do Livramento', tipo: 'ong' },
   { nome: 'Amigos do Norte', estado: 'TO', cidade: 'Pau D\'Arco', tipo: 'ong' },
+] as const
+
+/**
+ * O caso que abre a issue: o termo cruza dois campos (nome e cidade) e nenhuma
+ * ordem entre eles é a "certa". Os dois vizinhos existem para o teste falhar se
+ * a busca passar a casar só um dos termos.
+ */
+const catsInCuritiba = [
+  { nome: 'Gatos de Rua', estado: 'PR', cidade: 'Curitiba', tipo: 'ong' },
+  { nome: 'Cães de Rua', estado: 'PR', cidade: 'Curitiba', tipo: 'ong' },
+  { nome: 'Gatos de Rua', estado: 'SP', cidade: 'Santos', tipo: 'ong' },
 ] as const
 
 describe('normalizeText', () => {
@@ -75,9 +86,15 @@ describe('filterInitiatives', () => {
     expect(filterInitiatives(initiatives, { search: 'CE' })).toHaveLength(1)
   })
 
+  it('"gatos curitiba" acha a de gatos em Curitiba, digitada em qualquer ordem', () => {
+    const found = filterInitiatives(catsInCuritiba, { search: 'gatos curitiba' })
+    expect(found.map((i) => `${i.nome} / ${i.cidade}`)).toEqual(['Gatos de Rua / Curitiba'])
+    expect(filterInitiatives(catsInCuritiba, { search: 'curitiba gatos' })).toEqual(found)
+  })
+
   it('exige todas as palavras, em qualquer ordem', () => {
     const found = filterInitiatives(apostrophed, { search: 'gatos santa barbara' })
-    expect(found.map((i) => i.nome)).toEqual(['Gatos de Rua'])
+    expect(found.map((i) => i.nome)).toEqual(['Gatos do Oeste'])
     expect(filterInitiatives(apostrophed, { search: 'santa barbara gatos' })).toEqual(found)
   })
 
@@ -113,7 +130,7 @@ describe('filterInitiatives', () => {
   })
 
   it('iniciativa sem redes não quebra a busca nem some dos resultados', () => {
-    expect(filterInitiatives(apostrophed, { search: 'gatos' })).toHaveLength(1)
+    expect(filterInitiatives(apostrophed, { search: 'gatos do oeste' })).toHaveLength(1)
     expect(filterInitiatives(initiatives, { search: 'protetora ana' })).toHaveLength(1)
   })
 
