@@ -155,9 +155,9 @@ describe('Chaves de Doação, regra nº 1: nenhuma chave sem Fonte', () => {
   })
 
   /*
-   * Só o CNPJ é publicado como chave (ver docs/adr/0006). Os tipos que
-   * publicavam e-mail e telefone saíram do schema: o discriminador não os
-   * conhece mais, então o YAML que os usar é reprovado na CI.
+   * Só o CNPJ é publicado como chave. Os tipos que publicavam e-mail e telefone
+   * saíram do schema: o discriminador não os conhece mais, então o YAML que os
+   * usar é reprovado na CI.
    */
   it('rejeita pix-email e pix-telefone: tipos não existem mais', () => {
     expect(withDonations([{ tipo: 'pix-email', chave: 'doacao@exemplo.org', fonte: source }]).success).toBe(false)
@@ -267,8 +267,8 @@ describe('Selo Verificado', () => {
 /*
  * Chave de pessoa em texto livre. Nome e descrição são publicados como vieram,
  * então a política que barra a chave no campo de chave vale também para o que
- * se escreve neles (ver docs/adr/0006). O que se testa aqui é o que o
- * Contribuidor observa: o texto passa ou é recusado, e com qual mensagem.
+ * se escreve neles. O que se testa aqui é o que o Contribuidor observa: o texto
+ * passa ou é recusado, e com qual mensagem.
  */
 describe('chave de pessoa em nome e descrição', () => {
   const withDescription = (descricao: string) =>

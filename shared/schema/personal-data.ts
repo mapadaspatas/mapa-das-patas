@@ -1,8 +1,8 @@
 /**
- * Política de dados pessoais (ver docs/adr/0006): a única chave PIX publicada é
- * o CNPJ, dado empresarial público. Chave de pessoa — CPF, e-mail, telefone ou
- * chave aleatória — nunca é republicada: a doação entra como pix-na-fonte e o
- * site aponta para o canal oficial onde ela está.
+ * Política de dados pessoais: a única chave PIX publicada é o CNPJ, dado
+ * empresarial público. Chave de pessoa — CPF, e-mail, telefone ou chave
+ * aleatória — nunca é republicada: a doação entra como pix-na-fonte e o site
+ * aponta para o canal oficial onde ela está.
  *
  * Mora fora de `initiative.ts` por causa do peso: aquele arquivo carrega o zod
  * e a lista de municípios do IBGE, e quem usa isto fora da validação (o

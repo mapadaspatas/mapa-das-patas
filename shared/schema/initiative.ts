@@ -10,9 +10,9 @@ import {
 import { initiativeTypes, needs, species, states } from './vocabulary.ts'
 
 /**
- * Schema da Iniciativa: costura central do projeto (ver spec e CONTEXT.md).
- * Reutilizado pela coleção do @nuxt/content, pela validação de CI,
- * pelo script de importação e pela Function de Cadastro.
+ * Schema da Iniciativa: costura central do projeto. Reutilizado pela coleção do
+ * @nuxt/content, pela validação de CI, pelo script de importação e pela Function
+ * de Cadastro.
  *
  * Os nomes dos campos seguem o formato de dados publicado (pt-BR, igual aos
  * YAMLs em content/iniciativas); o código em volta deles é em inglês.
@@ -90,7 +90,7 @@ const socialSchema = z.strictObject({
 /**
  * Imagem da Iniciativa: arquivo versionado no repositório junto com o YAML,
  * enviado pela própria Iniciativa no Cadastro. Nunca uma URL externa: link de
- * CDN de rede social expira em horas e quebra o site (ver docs/adr/0003).
+ * CDN de rede social expira em horas e quebra o site.
  */
 export const imagePathOf = (slug: string) => `/imagens/iniciativas/${slug}.webp`
 

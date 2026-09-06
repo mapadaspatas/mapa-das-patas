@@ -138,13 +138,6 @@ export const strings = {
     personalKeyWarningTitle: 'Isso parece uma chave pessoal',
     personalKeyWarningText:
       'Só publicamos CNPJ como chave PIX. CPF, e-mail e telefone identificam uma pessoa, e não são republicados aqui. Responda que a chave é de uma pessoa: mostramos ao doador o link oficial onde a chave está.',
-    /*
-     * O mesmo texto que o schema devolve na recusa (ver
-     * shared/schema/personal-data.ts). Aparece enquanto se digita o nome ou a
-     * descrição, para a pessoa corrigir antes de enviar em vez de descobrir a
-     * recusa depois — e é o mesmo texto justamente para os dois momentos não
-     * dizerem coisas diferentes sobre a mesma regra.
-     */
     personalKeyInText: personalKeyInTextMessage,
     usePixAtSource: 'A chave é de uma pessoa',
     publicNoticeTitle: 'O que você enviar fica público',
