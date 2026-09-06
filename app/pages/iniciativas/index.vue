@@ -7,7 +7,7 @@ useSeoMeta({ title: strings.initiatives.title, description: strings.list.descrip
 
 const { data: initiatives } = await useAsyncData('iniciativas-listagem', () =>
   queryCollection('iniciativas')
-    .select('stem', 'nome', 'estado', 'cidade', 'tipo', 'especies', 'necessidades', 'imagem', 'verificado', 'doacoes')
+    .select('stem', 'nome', 'estado', 'cidade', 'tipo', 'especies', 'necessidades', 'imagem', 'verificado', 'doacoes', 'redes')
     .all(),
 )
 
@@ -95,6 +95,11 @@ const countsByState = computed(() => {
   return counts
 })
 
+/** Nome do estado por extenso; UF que não conhecemos volta como veio da URL. */
+function stateName(uf: string) {
+  return ufShapes[uf as keyof typeof ufShapes]?.nome ?? uf
+}
+
 /**
  * Resultados em blocos por estado, dos maiores para os menores. A ordem é a
  * concentração real do diretório (São Paulo tem quase metade), e quem procura
@@ -110,7 +115,7 @@ const groups = computed(() => {
   return [...byState.entries()]
     .map(([uf, items]) => ({
       uf,
-      nome: ufShapes[uf as keyof typeof ufShapes]?.nome ?? uf,
+      nome: stateName(uf),
       items: [...items].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')),
     }))
     .sort((a, b) => b.items.length - a.items.length || a.nome.localeCompare(b.nome, 'pt-BR'))
@@ -156,13 +161,27 @@ const speciesOptions = withAll(strings.list.allFeminine, speciesValues
 const needOptions = withAll(strings.list.allFeminine, needValues
   .map((value) => ({ label: needLabels[value], value })))
 
+/**
+ * O nome de cada critério, num lugar só: ele rotula o select e volta a aparecer
+ * no chip do filtro em vigor. Em duas listas paralelas, o primeiro critério
+ * novo sairia de sincronia entre as duas sem nada quebrar.
+ */
+const filterLabels: Record<keyof FilterState, string> = {
+  search: strings.list.searchFilter,
+  state: strings.list.stateFilter,
+  city: strings.list.cityFilter,
+  type: strings.list.typeFilter,
+  species: strings.list.speciesFilter,
+  need: strings.list.needFilter,
+}
+
 /** Um lugar só para desenhar os cinco selects, cada um com rótulo visível. */
 const selects = computed(() => [
-  { key: 'estado', label: strings.list.stateFilter, model: stateSelection, items: stateOptions.value, disabled: false },
-  { key: 'cidade', label: strings.list.cityFilter, model: citySelection, items: cityOptions.value, disabled: !filters.state },
-  { key: 'tipo', label: strings.list.typeFilter, model: typeSelection, items: typeOptions, disabled: false },
-  { key: 'especie', label: strings.list.speciesFilter, model: speciesSelection, items: speciesOptions, disabled: false },
-  { key: 'necessidade', label: strings.list.needFilter, model: needSelection, items: needOptions, disabled: false },
+  { key: 'estado', label: filterLabels.state, model: stateSelection, items: stateOptions.value, disabled: false },
+  { key: 'cidade', label: filterLabels.city, model: citySelection, items: cityOptions.value, disabled: !filters.state },
+  { key: 'tipo', label: filterLabels.type, model: typeSelection, items: typeOptions, disabled: false },
+  { key: 'especie', label: filterLabels.species, model: speciesSelection, items: speciesOptions, disabled: false },
+  { key: 'necessidade', label: filterLabels.need, model: needSelection, items: needOptions, disabled: false },
 ])
 
 const hasFilters = computed(() => Object.values(filters).some(Boolean))
@@ -171,9 +190,65 @@ function clearFilters() {
   for (const field of Object.keys(filters) as (keyof FilterState)[]) filters[field] = ''
 }
 
+/**
+ * Um chip por filtro em vigor, cada um removível sozinho. Com Estado, Espécie
+ * e Tipo aplicados ao mesmo tempo, a única saída era "Limpar filtros", que
+ * apaga tudo: quem queria alargar a busca em um critério tinha que recomeçar
+ * pelos cinco.
+ *
+ * O valor sai traduzido, nunca como o valor canônico do schema
+ * (`abrigo-santuario`, `lar-temporario`), que não é escrito para ser lido.
+ * Estado sai por extenso, e não pela sigla que o select mostra, para casar com
+ * o controle do mapa, que também diz "Paraná" com o filtro em vigor.
+ */
+const activeChips = computed(() => {
+  const valueLabel: Record<keyof FilterState, (value: string) => string> = {
+    search: (value) => value,
+    state: stateName,
+    city: (value) => value,
+    type: (value) => typeLabels[value as keyof typeof typeLabels] ?? value,
+    species: (value) => speciesLabels[value as keyof typeof speciesLabels] ?? value,
+    need: (value) => needLabels[value as keyof typeof needLabels] ?? value,
+  }
+  // A ordem dos chips é a de `filterLabels`: busca primeiro, depois os cinco
+  // selects na ordem em que aparecem na coluna de controles.
+  return (Object.keys(filterLabels) as (keyof FilterState)[])
+    .filter((field) => filters[field])
+    .map((field) => ({
+      field,
+      criterion: filterLabels[field],
+      value: valueLabel[field](filters[field]),
+    }))
+})
+
+/**
+ * O mapa é o primeiro bloco da coluna de controles e ocupa 368px: no celular
+ * ele empurrava a busca para 597px e o primeiro card para 944px, uma tela e
+ * meia abaixo, e quem abria a listagem não via nem onde buscar. Abaixo de `lg`
+ * ele começa recolhido atrás deste controle; de `lg` para cima a coluna é fixa
+ * ao lado dos resultados, o mapa não atrapalha ninguém e continua sempre
+ * aberto, por classe do Tailwind e não por medida de tela em JavaScript (o
+ * site é gerado estático: uma media query em JS mudaria a tela na hidratação).
+ */
+const mapOpen = ref(false)
+
+const mapToggleLabel = computed(() => {
+  if (mapOpen.value) return strings.map.hideMap
+  if (!filters.state) return strings.map.showMap
+  /* Com o mapa recolhido, ele é o único lugar onde o estado escolhido aparece
+   * desenhado. O controle repete qual é, para o recolhimento não esconder um
+   * filtro em vigor de quem só olha o topo da página. */
+  return strings.map.showMapFiltered(stateName(filters.state))
+})
+
 /** Clicar de novo no estado já filtrado desliga o filtro. */
 function toggleState(uf: string) {
-  filters.state = filters.state === uf ? '' : uf
+  const selecting = filters.state !== uf
+  filters.state = selecting ? uf : ''
+  /* Escolheu um estado: o mapa cumpriu o papel e sai da frente dos resultados,
+   * que é o que a pessoa foi ver. Ao desligar o filtro pelo próprio mapa ele
+   * fica aberto, porque quem faz isso costuma estar trocando de estado. */
+  if (selecting) mapOpen.value = false
 }
 </script>
 
@@ -184,10 +259,32 @@ function toggleState(uf: string) {
     </h1>
     <p class="mt-1 text-muted">{{ strings.list.description }}</p>
 
-    <div class="mt-7 grid gap-8 lg:grid-cols-[17rem_1fr] lg:gap-10">
+    <!--
+      Abaixo de lg as duas colunas viram uma pilha, e o vão entre elas é altura
+      que empurra o primeiro resultado para fora da tela: aqui ele é menor que
+      o vão lateral do desktop, onde ele não custa nada.
+    -->
+    <div class="mt-7 grid gap-6 lg:grid-cols-[17rem_1fr] lg:gap-10">
       <!-- Controles: mapa e filtros, cada um com rótulo à vista -->
       <div class="lg:sticky lg:top-6 lg:self-start">
-        <div class="rounded-2xl border border-muted bg-elevated/40 p-4">
+        <UButton
+          class="w-full justify-center lg:hidden"
+          color="neutral"
+          variant="outline"
+          size="sm"
+          :icon="mapOpen ? 'i-lucide-chevron-up' : 'i-lucide-map'"
+          :aria-expanded="mapOpen"
+          aria-controls="mapa-da-listagem"
+          @click="mapOpen = !mapOpen"
+        >
+          {{ mapToggleLabel }}
+        </UButton>
+
+        <div
+          id="mapa-da-listagem"
+          class="rounded-2xl border border-muted bg-elevated/40 p-4 max-lg:mt-3"
+          :class="{ 'max-lg:hidden': !mapOpen }"
+        >
           <UfMap :counts="countsByState" :selected="filters.state" @select="toggleState" />
           <UButton
             v-if="filters.state"
@@ -206,7 +303,7 @@ function toggleState(uf: string) {
           v-model="filters.search"
           icon="i-lucide-search"
           size="lg"
-          class="mt-4 w-full"
+          class="mt-3 w-full lg:mt-4"
           :placeholder="strings.list.searchPlaceholder"
           :aria-label="strings.list.searchPlaceholder"
         />
@@ -243,6 +340,36 @@ function toggleState(uf: string) {
 
       <!-- Resultados -->
       <div>
+        <!--
+          Sem filtro em vigor o bloco não existe: nada de espaço reservado
+          esperando por chip, que só empurraria os resultados para baixo.
+        -->
+        <div
+          v-if="activeChips.length"
+          role="group"
+          :aria-label="strings.list.activeFilters"
+          class="mb-4 flex flex-wrap gap-2"
+        >
+          <!--
+            O chip inteiro é o botão de remover, e não um texto com um "x"
+            colado do lado: no celular o alvo de toque é a peça toda. O
+            aria-label diz o critério e o valor, porque "Tirar" sozinho, lido em
+            sequência seis vezes, não distingue um chip do outro.
+          -->
+          <UButton
+            v-for="chip in activeChips"
+            :key="chip.field"
+            color="neutral"
+            variant="soft"
+            size="xs"
+            trailing-icon="i-lucide-x"
+            :aria-label="strings.list.removeFilter(chip.criterion, chip.value)"
+            @click="filters[chip.field] = ''"
+          >
+            {{ strings.list.activeFilter(chip.criterion, chip.value) }}
+          </UButton>
+        </div>
+
         <p class="font-mono text-xs text-muted" aria-live="polite">
           {{ strings.list.results(results.length) }}
         </p>

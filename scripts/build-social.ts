@@ -78,9 +78,10 @@ const PILAR = { tamanho: 28, passo: 62, ponto: 7, recuo: 34 }
 
 /**
  * Endereço impresso no cartão. Fica aqui, e não em `strings.ts`, porque o
- * site lê o dele de `NUXT_PUBLIC_SITE_URL` e uma imagem não acompanha
- * variável de ambiente: se o endereço mudar (ver `docs/deploy.md`),
- * troque esta linha e rode o script de novo.
+ * site lê o dele de `NUXT_PUBLIC_SITE_URL` e uma imagem não acompanha variável
+ * de ambiente: ela é assada no build. Se o domínio do site mudar, troque esta
+ * linha e rode o script de novo, senão os cartões seguem apontando para o
+ * endereço velho muito depois de a variável ter sido atualizada.
  */
 const ENDERECO = 'mapadaspatas.com.br'
 

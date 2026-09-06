@@ -10,6 +10,6 @@
 # Formato:
 # - slug: nome-da-iniciativa
 #   em: 2026-08-22
-#   pedido: oposicao   # ou: eliminacao (reescreve o histórico, ver docs/adr/0005)
+#   pedido: oposicao   # ou: eliminacao
 
 removidos: []

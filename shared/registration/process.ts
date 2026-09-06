@@ -6,8 +6,9 @@ import { generateSlug } from '../slug'
 import { checkImageBase64 } from './image'
 
 /**
- * Núcleo do Cadastro (ver CONTEXT.md): valida a submissão do formulário com o
- * MESMO schema da CI, gera o YAML e abre o PR, com Turnstile e GitHub
+ * Núcleo do Cadastro, a submissão que o formulário do site vira pull request
+ * no repositório: valida o que foi enviado com o MESMO schema que a CI usa,
+ * gera o YAML e abre o PR, com Turnstile e GitHub
  * injetados para teste. A Function do Cloudflare e o server route de dev
  * são só cascas finas em volta desta função.
  */
@@ -44,7 +45,7 @@ export interface PullRequestInput {
  * A branch pedida já existe no repositório. Nomes de branch determinísticos
  * (`verificar/<slug>`) são o que dá idempotência sem KV e sem banco: o segundo
  * clique colide aqui, e quem chama responde "já recebemos, está em revisão"
- * em vez de abrir um PR gêmeo (ver ADR 0001 e o ticket 20).
+ * em vez de abrir um PR gêmeo.
  */
 export class BranchExistsError extends Error {
   constructor(public readonly branch: string) {

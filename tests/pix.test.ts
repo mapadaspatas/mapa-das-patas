@@ -88,7 +88,8 @@ describe('pixBrCodeOf', () => {
     )
     expect(pix).toContain('011412345678000190')
 
-    // Pessoa física é pix-na-fonte: sem chave na página, sem QR (ver ADR 0006)
+    // Chave de pessoa física não é republicada: a doação entra como
+    // pix-na-fonte, sem chave na página e, portanto, sem QR para montar.
     expect(pixBrCodeOf({ tipo: 'pix-na-fonte', fonte: 'https://x.com/a' }, 'Abrigo', 'Curitiba'))
       .toBeNull()
   })

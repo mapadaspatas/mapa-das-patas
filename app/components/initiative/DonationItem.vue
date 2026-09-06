@@ -163,7 +163,8 @@ function onQrOpenChange(open: boolean) {
     </div>
 
     <!--
-      pix-na-fonte: a chave é pessoal e não é republicada (ver ADR 0006).
+      pix-na-fonte: a chave é de uma pessoa, e chave de pessoa física não é
+      republicada aqui nem com Fonte; o doador vai pegá-la no canal oficial.
       A ação vem primeiro e o canal aparece por extenso, para quem doa saber
       exatamente onde vai cair antes de clicar; a regra fica no miudinho, dita
       como decisão nossa e sem adjetivo sobre a Iniciativa.

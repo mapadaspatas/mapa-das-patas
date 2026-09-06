@@ -217,8 +217,10 @@ async function send(action: ConfirmationAction) {
         />
 
         <!--
-          A saída vem antes do pedido de confirmação, sem condição: é a regra 6
-          de docs/mensagens-para-iniciativas.md, e vale aqui igual.
+          A saída vem antes do pedido de confirmação, e sem nenhuma condição
+          atravessada na frente: pedido de sair do site é atendido sem discussão
+          e sem perguntar o motivo, então oferecê-lo depois de pedir o selo, ou
+          só a quem recusa, seria cobrar um pedágio por um direito.
         -->
         <div class="rounded-2xl border border-muted p-5">
           <h3 class="font-semibold text-highlighted">{{ t.leaveTitle }}</h3>

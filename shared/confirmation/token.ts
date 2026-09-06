@@ -1,9 +1,9 @@
 /**
  * Token de confirmação: `base64url(slug|canal|expira).base64url(HMAC-SHA256)`.
  *
- * O Moderador emite um destes por Iniciativa e cola o link na mensagem que já
- * manda hoje (ver `docs/mensagens-para-iniciativas.md`). O link só chega pelo
- * canal oficial que a página publica, então quem clicou tinha acesso àquele
+ * O Moderador emite um destes por Iniciativa e cola o link na mensagem que
+ * manda pelo canal oficial que a própria página publica (DM do perfil, e-mail
+ * institucional). Como o link só chega por lá, quem clicou tinha acesso àquele
  * canal — é a mesma prova de identidade de um link de confirmação por e-mail,
  * sem precisar de e-mail (o projeto não guarda o de ninguém).
  *
@@ -22,8 +22,9 @@ export interface ConfirmationToken {
 }
 
 /**
- * Validade padrão do link. Trinta dias cobrem com folga a retomada de duas
- * semanas prevista em `docs/mensagens-para-iniciativas.md`.
+ * Validade padrão do link. O Moderador que não recebe resposta cobra uma vez,
+ * duas semanas depois de mandar; trinta dias cobrem essa segunda tentativa com
+ * folga, sem deixar um link assinado valendo para sempre.
  */
 export const tokenLifetimeDays = 30
 

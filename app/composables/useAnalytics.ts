@@ -86,11 +86,13 @@ export function useAnalytics() {
   }
 
   /**
-   * O termo digitado vai inteiro, e não só contado: é o que revela a cidade sem
-   * cobertura e a Iniciativa que ninguém cadastrou (ver docs/adr/0007). Por ser
-   * campo livre, está declarado em /privacidade em vez de prometido como
-   * anônimo. Vai com as pontas cortadas para "gatos" e "gatos " serem o mesmo
-   * termo no painel, e filtro vazio não gera evento nenhum.
+   * O termo digitado vai inteiro, e não só contado. Um contador diria quantas
+   * buscas houve; o que precisamos saber é qual cidade ficou sem cobertura e
+   * qual Iniciativa ninguém cadastrou, e isso só o termo em si revela. Por ser
+   * campo livre, ele está declarado em /privacidade em vez de prometido como
+   * anônimo: quem digita escolhe o que escreve ali. Vai com as pontas cortadas
+   * para "gatos" e "gatos " serem o mesmo termo no painel, e filtro vazio não
+   * gera evento nenhum.
    */
   function trackSearch(filters: AnalyticsFilterPayload) {
     const activeEntries = Object.entries(filters)

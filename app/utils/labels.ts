@@ -1,7 +1,12 @@
 import { donationPlatformOf } from './donation-platforms'
 import type { Donation, DonationType, Initiative } from '../../shared/schema/initiative'
 
-/** Rótulos pt-BR dos valores canônicos do domínio (ver CONTEXT.md). */
+/**
+ * Rótulos pt-BR dos valores canônicos do domínio. O valor canônico (`ong`,
+ * `abrigo-santuario`, `lar-temporario`) é o que fica no YAML, no schema e na
+ * URL de filtro; nenhuma tela o mostra cru, é sempre por aqui que ele vira
+ * texto de leitura.
+ */
 
 export const typeLabels: Record<Initiative['tipo'], string> = {
   'ong': 'ONG',
