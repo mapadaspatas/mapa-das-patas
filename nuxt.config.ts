@@ -90,6 +90,8 @@ export default defineNuxtConfig({
         'lucide:image-plus',
         'lucide:package',
         'lucide:share-2',
+        'lucide:megaphone',
+        'lucide:download',
         'lucide:mail',
         'simple-icons:github',
         'simple-icons:instagram',

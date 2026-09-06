@@ -197,6 +197,17 @@ export const strings = {
     share: 'Compartilhar',
     shareText: (name: string) => `${name} precisa de ajuda. Veja como doar com segurança:`,
     shareLinkCopied: 'Link copiado!',
+    promote: 'Divulgar',
+    promoteTitle: 'Arte para stories',
+    promoteDescription:
+      'Uma imagem vertical com o nome, a cidade e o endereço desta página, montada aqui no seu navegador. O endereço vai junto para quem vir o story conferir a chave e a fonte atualizadas, em vez de acreditar na imagem.',
+    promoteWithQr: 'Incluir o QR Code do PIX',
+    promoteWithQrHelp: 'O mesmo código que aparece na página, montado a partir da chave publicada aqui.',
+    promoteGenerating: 'Montando a arte…',
+    promoteSave: 'Salvar imagem',
+    promoteShare: 'Compartilhar',
+    promoteFailed: 'Não deu para montar a arte. Tente de novo.',
+    promoteFileName: (slug: string) => `mapa-das-patas-${slug}.png`,
   },
   badge: {
     verified: 'Verificada',

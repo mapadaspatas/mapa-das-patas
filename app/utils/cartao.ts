@@ -412,7 +412,7 @@ export function desenharCartao(
     )
   }
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${largura} ${altura}" width="${largura}" height="${altura}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${largura} ${altura}" width="${largura}" height="${altura}">
   ${dados.fontesEmbutidas ? `<defs><style>${dados.fontesEmbutidas}</style></defs>` : ''}
   <rect width="${largura}" height="${altura}" fill="${COR.fundo}"/>
   ${marca.svg}

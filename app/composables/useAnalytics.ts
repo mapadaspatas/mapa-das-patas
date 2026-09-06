@@ -85,6 +85,18 @@ export function useAnalytics() {
     })
   }
 
+  /*
+   * O QR vai junto porque é a única escolha que a arte oferece, e a resposta
+   * decide se vale o trabalho de mantê-la: se quase ninguém liga, o controle
+   * some; se quase todo mundo liga, ele nasce ligado.
+   */
+  function trackPromote(slug: string, comQrCode: boolean) {
+    track('divulgar_iniciativa', {
+      iniciativa: slug,
+      qrcode: comQrCode,
+    })
+  }
+
   /**
    * O termo digitado vai inteiro, e não só contado: é o que revela a cidade sem
    * cobertura e a Iniciativa que ninguém cadastrou (ver docs/adr/0007). Por ser
@@ -115,6 +127,7 @@ export function useAnalytics() {
     trackOpenCampaign,
     trackOpenSocial,
     trackShare,
+    trackPromote,
     trackSearch,
     trackCadastroSuccess,
   }
