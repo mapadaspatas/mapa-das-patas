@@ -1,0 +1,24 @@
+nome: Protetores de Animais Goiania
+tipo: abrigo-santuario
+estado: GO
+cidade: Aparecida de Goiânia
+descricao: Abrigamos 157🐱 e 30🐶. Nos ajude a cuidar deles com dignidade, e nos
+  ajude também a fazer novos resgates.
+especies:
+  - gatos
+  - caes
+necessidades:
+  - racao
+  - lar-temporario
+  - voluntarios
+  - castracao
+  - medicamentos
+doacoes:
+  - tipo: apoio-recorrente
+    url: https://apoia.se/protetoresdeanimaisgoiania
+    fonte: https://www.instagram.com/protetoresdeanimais/
+  - tipo: pix-na-fonte
+    fonte: https://www.instagram.com/protetoresdeanimais/
+redes:
+  instagram: protetoresdeanimais
+imagem: /imagens/iniciativas/protetores-de-animais-goiania.webp
