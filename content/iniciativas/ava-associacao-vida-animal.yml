@@ -1,0 +1,45 @@
+nome: AVA - Associação Vida Animal
+tipo: associacao
+estado: SP
+cidade: Ribeirão Preto
+descricao: >-
+  (Texto próprio da associação)
+
+  A A.V.A - Associação Vida Animal - entidade civil sem fins lucrativos foi
+  fundada em 05 de julho de 1996. A entidade conta com sede própria, situada na
+  Rua João Ramalho, 179, em Ribeirão Preto - SP.
+
+
+  A entidade trabalha na conscientização da população sobre a importância da
+  preservação ambiental e do respeito aos direitos dos animais. Quando falamos
+  em preservação ambiental, logo são lembradas as matanças de baleias, a
+  degradação da Amazônia ou da Mata Atlântica - questões da mais alta
+  importância. No entanto, não podemos esquecer de nossos quintais e das nossas
+  ruas. Daí a preocupação da A.V.A. com os animais domésticos e com os cavalos
+  de carroças.
+
+
+  A Associação apoia ações educativas que orientam sobre a posse responsável e
+  investe no controle populacional de cães e gatos. A ONG entende que a
+  castração é a solução para o problema das zoonoses, dos maus-tratos, da
+  procriação indiscriminada e consequentemente do abandono dos animais
+  domésticos.
+
+
+  Além de ser uma entidade sem fins lucrativos, a AVA não recebe nenhuma verba
+  Municipal, Estadual ou Federal. Os recursos vêm de doações da população,
+  pessoas simpatizantes da causa animal e protetores que acreditam no trabalho
+  da associação.
+
+  Com o apoio de voluntários, conseguimos socorrer, alimentar, tratar e doar
+  cães e gatos. A ideia não é criar abrigos ou recolher todos os animais de rua.
+  O intuito é trabalhar promovendo o equilíbrio, melhorar a qualidade de vida
+  dos animais e tornar a cidade onde vivemos mais humana.
+especies:
+  - caes
+  - gatos
+necessidades:
+  - castracao
+redes:
+  instagram: avaribeirao
+imagem: /imagens/iniciativas/ava-associacao-vida-animal.webp
