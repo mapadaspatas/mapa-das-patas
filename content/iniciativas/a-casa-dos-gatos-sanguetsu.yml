@@ -6,8 +6,23 @@ descricao: Iniciativa de proteção animal em Serra (ES). Informações reunidas
   pela comunidade a partir de fontes públicas. Ajude pelos canais oficiais.
 especies:
   - gatos
-redes:
-  instagram: acasadosgatossanguetsu
+  - caes
+necessidades:
+  - racao
+  - castracao
+  - medicamentos
+  - lar-temporario
+  - voluntarios
 doacoes:
   - tipo: pix-na-fonte
     fonte: https://instagram.com/acasadosgatossanguetsu
+  - tipo: paypal
+    url: https://www.paypal.com/donate/?hosted_button_id=UPRYFTXY92QKU
+    fonte: https://www.instagram.com/acasadosgatossanguetsu
+redes:
+  instagram: acasadosgatossanguetsu
+  facebook: https://www.facebook.com/acasadosgatossanguetsu/
+  tiktok: https://www.tiktok.com/@acasadosgatossanguetsu
+  x: https://x.com/abrigosanguetsu
+  linktree: https://linktr.ee/acasadosgatossanguetsu
+imagem: /imagens/iniciativas/a-casa-dos-gatos-sanguetsu.webp
