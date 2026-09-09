@@ -1,0 +1,23 @@
+nome: Abrigo de Queimados
+tipo: abrigo-santuario
+estado: RJ
+cidade: Queimados
+descricao: Projeto voluntário de proteção animal localizado na Baixada
+  Fluminense, no Rio de Janeiro, que cuida de cães e gatos resgatados.
+especies:
+  - caes
+  - gatos
+necessidades:
+  - racao
+  - lar-temporario
+  - voluntarios
+  - castracao
+  - medicamentos
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://www.instagram.com/abrigodequeimados
+redes:
+  instagram: abrigodequeimados
+  facebook: https://www.facebook.com/share/1MUJuiDZ63/
+  site: https://abrigodequeimados.my.canva.site/
+imagem: /imagens/iniciativas/abrigo-de-queimados.webp
