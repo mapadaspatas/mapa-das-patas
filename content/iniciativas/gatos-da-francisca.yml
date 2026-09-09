@@ -1,0 +1,22 @@
+nome: Gatos da Francisca
+tipo: associacao
+estado: RJ
+cidade: Rio de Janeiro
+descricao: Grupo de apoio a gatos abandonados. Buscamos tratar, castrar e
+  conseguir adoções para os gatinhos.
+especies:
+  - gatos
+necessidades:
+  - racao
+  - lar-temporario
+  - voluntarios
+  - castracao
+  - medicamentos
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://www.instagram.com/gatosdefrancisca
+redes:
+  instagram: gatosdefrancisca
+  facebook: https://www.facebook.com/share/19KK8wC1hz/
+  site: https://sites.google.com/view/gatosdefrancisca/p%C3%A1gina-inicial?pli=1&authuser=0
+imagem: /imagens/iniciativas/gatos-da-francisca.webp
