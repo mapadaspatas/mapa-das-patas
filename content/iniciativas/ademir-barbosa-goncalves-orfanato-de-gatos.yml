@@ -1,0 +1,20 @@
+nome: Ademir Barbosa Gonçalves - Orfanato de Gatos
+tipo: protetor-independente
+estado: GO
+cidade: Goiânia
+descricao: Protetores independentes que abrigam mais de 170 gatos em Goiânia -
+  GO. Abrigo mantido por doações.
+especies:
+  - gatos
+necessidades:
+  - racao
+  - castracao
+  - lar-temporario
+  - voluntarios
+  - medicamentos
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/ademir_orfanato_de_gatos
+redes:
+  instagram: ademir_orfanato_de_gatos
+imagem: /imagens/iniciativas/ademir-barbosa-goncalves-orfanato-de-gatos.webp
