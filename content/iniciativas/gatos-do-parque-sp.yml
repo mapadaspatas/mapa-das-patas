@@ -1,0 +1,17 @@
+nome: Gatos do Parque SP
+tipo: associacao
+estado: SP
+cidade: São Paulo
+descricao: O Gatos do Parque SP nasceu para proteger e cuidar dos gatos que
+  vivem em um parque, muitos deles abandonados e em situação de vulnerabilidade.
+  Atuamos diariamente com alimentação, resgates, atendimento veterinário,
+  castrações e busca por lares seguros.
+especies:
+  - gatos
+doacoes:
+  - tipo: pix-cnpj
+    chave: 62.985.356/0001-89
+    fonte: https://www.instagram.com/gatosdoparquesp/
+redes:
+  instagram: gatosdoparquesp
+imagem: /imagens/iniciativas/gatos-do-parque-sp.webp
