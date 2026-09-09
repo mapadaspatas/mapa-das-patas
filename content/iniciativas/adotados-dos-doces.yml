@@ -1,12 +1,23 @@
-nome: Adotados dos doces
-tipo: projeto-informal
+nome: Resgatados da Dô
+tipo: protetor-independente
 estado: SP
 cidade: Ribeirão Preto
 descricao: Iniciativa de proteção animal em Ribeirão Preto (SP). Informações
   reunidas pela comunidade a partir de fontes públicas. Ajude pelos canais
   oficiais.
-redes:
-  instagram: adotadosdosdoces
+especies:
+  - caes
+  - gatos
+necessidades:
+  - voluntarios
+  - castracao
+  - medicamentos
+  - racao
+  - lar-temporario
 doacoes:
   - tipo: pix-na-fonte
-    fonte: https://instagram.com/adotadosdosdoces
+    fonte: https://www.instagram.com/resgatadosdado/
+redes:
+  instagram: resgatadosdado
+  site: https://pixresgatadosdodoces.netlify.app/
+imagem: /imagens/iniciativas/adotados-dos-doces.webp
