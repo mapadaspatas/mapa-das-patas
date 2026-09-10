@@ -1,0 +1,21 @@
+nome: Santuário Filhos de Shanti
+tipo: ong
+estado: SP
+cidade: Taubaté
+descricao: Resgate de equinos e felinos com mais de 150 resgatados.
+especies:
+  - caes
+  - cavalos
+necessidades:
+  - racao
+doacoes:
+  - tipo: pix-cnpj
+    chave: 51.998.187/0001-03
+    fonte: https://www.instagram.com/santuariofilhosdeshanti
+  - tipo: apoio-recorrente
+    url: https://apoia.se/santuariofilhosdeshanti
+    fonte: https://www.instagram.com/santuariofilhosdeshanti
+redes:
+  instagram: santuariofilhosdeshanti
+  linktree: https://linktr.ee/santuariofilhosdeshanti
+imagem: /imagens/iniciativas/santuario-filhos-de-shanti.webp
