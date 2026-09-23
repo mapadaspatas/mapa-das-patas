@@ -1,0 +1,33 @@
+nome: Instituto Quatro Patas Fortaleza
+tipo: ong
+estado: CE
+cidade: Fortaleza
+descricao: Nossa missão é resgatar animais, oferecer abrigo, conforto, alimento,
+  atendimento veterinário e conectar a pessoas que estejam dispostas a adotar.
+  Cada patinha resgatada é uma vida transformada, Junte-se a nós por amor aos
+  que não tem voz.
+especies:
+  - gatos
+  - caes
+  - cavalos
+necessidades:
+  - castracao
+  - voluntarios
+  - lar-temporario
+  - racao
+  - medicamentos
+doacoes:
+  - tipo: apoio-recorrente
+    url: https://apoia.se/4patasfortaleza
+    fonte: https://www.instagram.com/p/Dcq0VApEUD7/?img_index=12
+  - tipo: pix-cnpj
+    chave: 63.416.030/0001-01
+    fonte: https://www.instagram.com/p/DcMfuHfAYzM/?img_index=10
+redes:
+  instagram: 4patasfortaleza
+  tiktok: https://www.tiktok.com/@4patasfortaleza
+  youtube: https://www.youtube.com/@quatropatasfortaleza
+  x: https://x.com/4patasfortaleza
+  site: https://sites.google.com/view/4patasfortaleza
+  linktree: https://linktr.ee/4patasfortaleza
+imagem: /imagens/iniciativas/instituto-quatro-patas-fortaleza.webp
