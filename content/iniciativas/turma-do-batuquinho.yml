@@ -1,0 +1,17 @@
+nome: Turma do Batuquinho
+tipo: protetor-independente
+estado: PA
+cidade: Belém
+descricao: Protetor Independente em Belém-PA que cuida de 51 gatinhos
+especies:
+  - gatos
+necessidades:
+  - racao
+  - medicamentos
+  - castracao
+doacoes:
+  - tipo: pix-na-fonte
+    fonte: https://instagram.com/batuqueogato
+redes:
+  instagram: batuqueogato
+imagem: /imagens/iniciativas/turma-do-batuquinho.webp
